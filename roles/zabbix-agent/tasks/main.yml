@@ -1,0 +1,12 @@
+---
+- name: Configure Zabbix APT repository
+  ansible.builtin.include_tasks: repo.yml
+  tags: [zabbix_agent, repo]
+
+- name: Install zabbix-agent2 package
+  ansible.builtin.include_tasks: install.yml
+  tags: [zabbix_agent, packages]
+
+- name: Deploy zabbix-agent2 config and service
+  ansible.builtin.include_tasks: config.yml
+  tags: [zabbix_agent, config]

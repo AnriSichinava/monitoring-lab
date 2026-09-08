@@ -1,0 +1,23 @@
+---
+- name: Ensure zabbix-agent2 include directory exists
+  ansible.builtin.file:
+    path: "{{ zabbix_agent_include_dir }}"
+    state: directory
+    owner: zabbix
+    group: zabbix
+    mode: "0755"
+
+- name: Deploy zabbix-agent2 config
+  ansible.builtin.template:
+    src: zabbix_agent2.conf.j2
+    dest: /etc/zabbix/zabbix_agent2.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart zabbix-agent2
+
+- name: Ensure zabbix-agent2 service is enabled and running
+  ansible.builtin.systemd:
+    name: zabbix-agent2
+    enabled: true
+    state: started

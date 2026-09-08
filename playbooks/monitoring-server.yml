@@ -6,7 +6,7 @@
   become: true
   roles:
     - common
+    - zabbix-agent   # server monitors itself
     # - zabbix-server
     # - victoriametrics
     # - grafana
-    # - zabbix-agent   # server also monitors itself

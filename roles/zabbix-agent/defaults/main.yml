@@ -1,0 +1,25 @@
+---
+# Defaults for the `zabbix-agent` role.
+# Override in group_vars/host_vars — role defaults are the fallback.
+
+# Zabbix version — LTS release
+zabbix_major_version: "7.0"
+zabbix_release_deb_version: "7.0-2"
+
+# Where this agent reports metrics.
+# By default, resolves to the first host in the `monitoring_servers` inventory group.
+# Override per-host or per-group if the agent should talk to a different Zabbix server.
+zabbix_server_ip: "{{ hostvars[groups['monitoring_servers'][0]].ansible_host }}"
+
+# How this host identifies itself to Zabbix. Must match a host defined in Zabbix UI.
+zabbix_agent_hostname: "{{ inventory_hostname }}"
+
+# Listening port for passive checks (Zabbix server pulls).
+zabbix_agent_listen_port: 10050
+
+# Logging.
+zabbix_agent_log_file: /var/log/zabbix/zabbix_agent2.log
+zabbix_agent_log_file_size: 10
+
+# Drop-in directory for user parameters and plugin configs.
+zabbix_agent_include_dir: /etc/zabbix/zabbix_agent2.d

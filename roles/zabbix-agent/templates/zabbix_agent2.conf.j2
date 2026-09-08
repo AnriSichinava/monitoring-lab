@@ -1,0 +1,27 @@
+# {{ ansible_managed }}
+# monitoring-lab / zabbix-agent role — Zabbix Agent 2 configuration
+
+# Zabbix server(s) allowed to connect for passive checks (server pulls from us).
+Server={{ zabbix_server_ip }}
+
+# Zabbix server(s) for active checks (we push to server).
+ServerActive={{ zabbix_server_ip }}
+
+# Hostname this agent reports as. Must match a host entry in Zabbix UI.
+Hostname={{ zabbix_agent_hostname }}
+
+# TCP port to listen on for passive checks.
+ListenPort={{ zabbix_agent_listen_port }}
+
+# Logging.
+LogFile={{ zabbix_agent_log_file }}
+LogFileSize={{ zabbix_agent_log_file_size }}
+
+# Drop-in configs — user parameters, plugin configs, etc.
+Include={{ zabbix_agent_include_dir }}/*.conf
+
+# PID file.
+PidFile=/run/zabbix/zabbix_agent2.pid
+
+# Control socket (used by zabbix_agent2 -R runtime commands).
+ControlSocket=/run/zabbix/agent.sock

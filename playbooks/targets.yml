@@ -6,5 +6,5 @@
   become: true
   roles:
     - common
-    # - zabbix-agent
+    - zabbix-agent
     # - telegraf

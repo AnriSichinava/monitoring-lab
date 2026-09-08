@@ -1,0 +1,17 @@
+---
+# Zabbix ships separate repo paths for x86_64 vs aarch64 (arm64).
+# The release .deb only configures apt sources; the arch of the sources it points at matters.
+
+- name: Determine Zabbix repo path for host architecture
+  ansible.builtin.set_fact:
+    zabbix_repo_arch_path: "{{ 'ubuntu-arm64' if ansible_architecture == 'aarch64' else 'ubuntu' }}"
+
+- name: Install Zabbix release package (adds APT repo + signing key)
+  ansible.builtin.apt:
+    deb: "https://repo.zabbix.com/zabbix/{{ zabbix_major_version }}/{{ zabbix_repo_arch_path }}/pool/main/z/zabbix-release/zabbix-release_{{ zabbix_release_deb_version }}+ubuntu{{ ansible_distribution_version }}_all.deb"
+  register: zabbix_repo_install
+
+- name: Refresh apt cache after adding Zabbix repo
+  ansible.builtin.apt:
+    update_cache: true
+  when: zabbix_repo_install.changed

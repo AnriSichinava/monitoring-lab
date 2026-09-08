@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  role_name: common
+  author: Anri Sitchinava
+  description: Base OS configuration for monitoring-lab hosts
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+  galaxy_tags:
+    - system
+    - security
+    - base
+
+dependencies: []

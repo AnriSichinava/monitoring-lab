@@ -1,0 +1,12 @@
+---
+# Provisions mon-server: base hardening + full monitoring backend stack.
+
+- name: Configure monitoring server
+  hosts: monitoring_servers
+  become: true
+  roles:
+    - common
+    # - zabbix-server
+    # - victoriametrics
+    # - grafana
+    # - zabbix-agent   # server also monitors itself

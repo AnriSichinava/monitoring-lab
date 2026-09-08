@@ -1,0 +1,10 @@
+---
+# Ansible Vault encrypted secrets.
+# This file will be encrypted with: ansible-vault encrypt inventories/production/group_vars/vault.yml
+# Placeholder values below — replace before encrypting.
+
+vault_zabbix_admin_password: CHANGEME_generate_strong_password
+vault_zabbix_db_password: CHANGEME_generate_strong_password
+vault_grafana_admin_password: CHANGEME_generate_strong_password
+vault_postgres_admin_password: CHANGEME_generate_strong_password
+vault_slack_webhook_url: https://hooks.slack.com/services/CHANGEME/CHANGEME/CHANGEME

@@ -1,0 +1,31 @@
+---
+# Variables applied to every host.
+# Component-specific vars live in role defaults; only cross-cutting settings go here.
+
+timezone: Asia/Jerusalem
+locale: en_US.UTF-8
+
+# Base admin user created by the `common` role.
+admin_user: anrisi
+admin_shell: /bin/bash
+
+# NTP servers (pool.ntp.org fallback).
+ntp_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
+
+# Packages installed on every host by the `common` role.
+common_packages:
+  - curl
+  - wget
+  - vim
+  - htop
+  - net-tools
+  - unzip
+  - jq
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - python3
+  - python3-pip

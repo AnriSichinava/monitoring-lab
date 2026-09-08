@@ -1,0 +1,48 @@
+# Ansible
+*.retry
+.vault-pass
+.vault-pass.*
+*.vault
+!vault.yml
+inventories/**/host_vars/**/vault.yml.decrypted
+
+# Python (virtualenvs, caches, packages)
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.python-version
+*.egg-info/
+dist/
+build/
+
+# Molecule
+.molecule/
+.cache/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Local overrides
+inventories/local/
+inventories/**/host_vars/*.local.yml
+group_vars/**/*.local.yml
+
+# Secrets that must never be committed
+*.pem
+*.key
+!*.pub.key
+id_rsa*
+id_ed25519*
+!*.pub
+
+# CI artifacts
+.gitlab-ci-local/

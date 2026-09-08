@@ -1,0 +1,6 @@
+---
+# Tasks for `common` role. Body to be implemented in Phase 2.
+
+- name: Placeholder — common role not yet implemented
+  ansible.builtin.debug:
+    msg: "TODO: implement common role (timezone, users, SSH hardening, packages, unattended-upgrades, NTP)"

@@ -1,0 +1,10 @@
+---
+# Provisions mon-target-*: base hardening + agents only.
+
+- name: Configure monitoring targets
+  hosts: monitoring_targets
+  become: true
+  roles:
+    - common
+    # - zabbix-agent
+    # - telegraf

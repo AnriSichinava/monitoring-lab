@@ -1,0 +1,18 @@
+---
+# Role defaults for `common`. Override in group_vars/host_vars as needed.
+
+# Timezone (also settable in group_vars/all.yml)
+common_timezone: "{{ timezone | default('UTC') }}"
+common_locale: "{{ locale | default('en_US.UTF-8') }}"
+
+# SSH hardening
+common_ssh_disable_password_auth: true
+common_ssh_disable_root_login: true
+common_ssh_port: 22
+
+# Unattended upgrades
+common_unattended_upgrades_enabled: true
+common_unattended_upgrades_reboot: false
+
+# Package list (overrideable, but group_vars/all.yml normally supplies)
+common_packages: "{{ common_packages | default([]) }}"

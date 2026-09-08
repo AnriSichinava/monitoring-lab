@@ -1,0 +1,6 @@
+// {{ ansible_managed }}
+// monitoring-lab / common role — enable unattended-upgrades daily timer
+
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+APT::Periodic::AutocleanInterval "7";

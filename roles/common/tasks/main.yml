@@ -1,6 +1,36 @@
 ---
-# Tasks for `common` role. Body to be implemented in Phase 2.
+# Dispatcher for the `common` role. Runs on every host before any component role.
+# Each concern is a separate task file so it can be tagged and re-run individually.
 
-- name: Placeholder — common role not yet implemented
-  ansible.builtin.debug:
-    msg: "TODO: implement common role (timezone, users, SSH hardening, packages, unattended-upgrades, NTP)"
+- name: Assert supported OS
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == "Ubuntu"
+      - ansible_distribution_major_version | int >= 22
+    fail_msg: "common role supports Ubuntu 22.04+ only (got {{ ansible_distribution }} {{ ansible_distribution_version }})"
+  tags: [always]
+
+- name: Install baseline packages
+  ansible.builtin.include_tasks: packages.yml
+  tags: [common, packages]
+
+- name: Configure timezone
+  ansible.builtin.include_tasks: timezone.yml
+  tags: [common, timezone, time]
+
+- name: Configure locale
+  ansible.builtin.include_tasks: locale.yml
+  tags: [common, locale]
+
+- name: Configure NTP time sync
+  ansible.builtin.include_tasks: ntp.yml
+  tags: [common, ntp, time]
+
+- name: Harden SSH
+  ansible.builtin.include_tasks: ssh.yml
+  tags: [common, ssh, security]
+
+- name: Configure unattended upgrades
+  ansible.builtin.include_tasks: unattended_upgrades.yml
+  when: common_unattended_upgrades_enabled
+  tags: [common, updates, security]

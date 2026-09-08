@@ -1,0 +1,28 @@
+---
+- name: Install unattended-upgrades
+  ansible.builtin.apt:
+    name: unattended-upgrades
+    state: present
+
+- name: Enable periodic upgrade timers
+  ansible.builtin.template:
+    src: auto_upgrades.conf.j2
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Configure automatic reboot behavior
+  ansible.builtin.template:
+    src: 52-reboot-overrides.conf.j2
+    dest: /etc/apt/apt.conf.d/52monitoring-lab-reboot-overrides
+    owner: root
+    group: root
+    mode: "0644"
+  when: common_unattended_upgrades_reboot
+
+- name: Ensure unattended-upgrades service is enabled and running
+  ansible.builtin.systemd:
+    name: unattended-upgrades
+    enabled: true
+    state: started

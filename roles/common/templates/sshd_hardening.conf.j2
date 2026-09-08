@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+# monitoring-lab / common role — SSH hardening drop-in
+# Loaded after /etc/ssh/sshd_config via Include /etc/ssh/sshd_config.d/*.conf
+
+PasswordAuthentication {{ 'no' if common_ssh_disable_password_auth else 'yes' }}
+ChallengeResponseAuthentication no
+KbdInteractiveAuthentication no
+
+PermitRootLogin {{ 'no' if common_ssh_disable_root_login else 'yes' }}
+
+PubkeyAuthentication yes
+UsePAM yes
+
+Port {{ common_ssh_port }}

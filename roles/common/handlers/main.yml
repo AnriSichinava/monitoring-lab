@@ -1,6 +1,4 @@
 ---
-# Handlers for `common`. Triggered by tasks via `notify:`.
-
 - name: Restart ssh
   ansible.builtin.service:
     name: ssh
@@ -9,4 +7,9 @@
 - name: Restart unattended-upgrades
   ansible.builtin.service:
     name: unattended-upgrades
+    state: restarted
+
+- name: Restart systemd-timesyncd
+  ansible.builtin.service:
+    name: systemd-timesyncd
     state: restarted

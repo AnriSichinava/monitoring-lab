@@ -1,0 +1,15 @@
+---
+- name: Deploy SSH hardening drop-in
+  ansible.builtin.template:
+    src: sshd_hardening.conf.j2
+    dest: /etc/ssh/sshd_config.d/99-monitoring-lab-hardening.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart ssh
+
+# Validate the full sshd config after our drop-in lands.
+# Runs before the handler restarts SSH, so a bad config fails the play instead of taking down access.
+- name: Validate sshd configuration
+  ansible.builtin.command: sshd -t
+  changed_when: false

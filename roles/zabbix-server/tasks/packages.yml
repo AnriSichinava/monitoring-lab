@@ -1,0 +1,25 @@
+---
+- name: Install PostgreSQL, Zabbix server, PHP stack, Nginx
+  ansible.builtin.apt:
+    name:
+      # PostgreSQL backend
+      - postgresql
+      - python3-psycopg2   # needed by community.postgresql modules
+      # Zabbix server + schema
+      - zabbix-server-pgsql
+      - zabbix-sql-scripts
+      # Frontend
+      - zabbix-frontend-php
+      - zabbix-nginx-conf
+      # Web server + PHP-FPM
+      - nginx
+      - php-fpm
+      - php-pgsql
+      - php-gd
+      - php-xml
+      - php-bcmath
+      - php-mbstring
+      - php-ldap
+    state: present
+    update_cache: true
+    cache_valid_time: 3600

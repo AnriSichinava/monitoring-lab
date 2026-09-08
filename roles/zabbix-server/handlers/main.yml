@@ -1,0 +1,15 @@
+---
+- name: Restart zabbix-server
+  ansible.builtin.service:
+    name: zabbix-server
+    state: restarted
+
+- name: Reload nginx
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded
+
+- name: Restart php-fpm
+  ansible.builtin.shell: |
+    systemctl restart $(systemctl list-unit-files 'php*-fpm.service' --no-legend | awk '{print $1}' | head -1)
+  changed_when: true

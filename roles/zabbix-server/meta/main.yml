@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  role_name: zabbix-server
+  author: Anri Sitchinava
+  description: Install and configure Zabbix Server 7.0 LTS with PostgreSQL backend, Nginx frontend, PHP-FPM
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+  galaxy_tags:
+    - monitoring
+    - zabbix
+    - server
+    - postgresql
+    - nginx
+
+dependencies:
+  - role: common

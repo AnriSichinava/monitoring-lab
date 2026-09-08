@@ -1,0 +1,23 @@
+---
+- name: Check if Zabbix schema is already imported
+  community.postgresql.postgresql_query:
+    db: "{{ zabbix_db_name }}"
+    login_user: "{{ zabbix_db_user }}"
+    login_password: "{{ zabbix_db_password }}"
+    login_host: "{{ zabbix_db_host }}"
+    login_port: "{{ zabbix_db_port }}"
+    query: "SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'users')"
+  register: zabbix_schema_check
+  no_log: true
+
+- name: Import Zabbix schema
+  ansible.builtin.shell:
+    cmd: >-
+      zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz
+      | psql -h {{ zabbix_db_host }} -p {{ zabbix_db_port }} -U {{ zabbix_db_user }} -d {{ zabbix_db_name }}
+  environment:
+    PGPASSWORD: "{{ zabbix_db_password }}"
+  when: not zabbix_schema_check.query_result[0].exists
+  no_log: true
+  register: zabbix_schema_import
+  changed_when: zabbix_schema_import.rc == 0

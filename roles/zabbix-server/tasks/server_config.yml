@@ -1,0 +1,18 @@
+---
+- name: Ensure zabbix server socket/run dir exists
+  ansible.builtin.file:
+    path: "{{ zabbix_server_socket_dir }}"
+    state: directory
+    owner: zabbix
+    group: zabbix
+    mode: "0755"
+
+- name: Deploy zabbix_server.conf
+  ansible.builtin.template:
+    src: zabbix_server.conf.j2
+    dest: /etc/zabbix/zabbix_server.conf
+    owner: root
+    group: zabbix
+    mode: "0640"   # contains DB password
+  notify: Restart zabbix-server
+  no_log: true

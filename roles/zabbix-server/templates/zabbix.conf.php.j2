@@ -1,0 +1,52 @@
+<?php
+// {{ ansible_managed }}
+// monitoring-lab / zabbix-server role — Zabbix frontend configuration
+
+// Zabbix GUI configuration file.
+global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT;
+
+$DB['TYPE']             = 'POSTGRESQL';
+$DB['SERVER']           = '{{ zabbix_db_host }}';
+$DB['PORT']             = '{{ zabbix_db_port }}';
+$DB['DATABASE']         = '{{ zabbix_db_name }}';
+$DB['USER']             = '{{ zabbix_db_user }}';
+$DB['PASSWORD']         = '{{ zabbix_db_password }}';
+
+// Schema name. Used for PostgreSQL.
+$DB['SCHEMA']           = '';
+
+// Used for TLS connection with strict certificate validation.
+$DB['ENCRYPTION']       = false;
+$DB['KEY_FILE']         = '';
+$DB['CERT_FILE']        = '';
+$DB['CA_FILE']          = '';
+$DB['VERIFY_HOST']      = false;
+$DB['CIPHER_LIST']      = '';
+
+// Vault configuration. Used if database credentials are stored in Vault secrets manager.
+$DB['VAULT']            = '';
+$DB['VAULT_URL']        = '';
+$DB['VAULT_DB_PATH']    = '';
+$DB['VAULT_TOKEN']      = '';
+$DB['VAULT_CERT_FILE']  = '';
+$DB['VAULT_KEY_FILE']   = '';
+
+// Use IEEE754 compatible value range for 64-bit Numeric (float) history values.
+$DB['DOUBLE_IEEE754']   = true;
+
+$ZBX_SERVER             = 'localhost';
+$ZBX_SERVER_PORT        = '{{ zabbix_server_listen_port }}';
+$ZBX_SERVER_NAME        = '{{ zabbix_frontend_display_name }}';
+
+$IMAGE_FORMAT_DEFAULT   = IMAGE_FORMAT_PNG;
+
+// Uncomment this block only if you are using Elasticsearch. Set $HISTORY['types'] with the required value types.
+// $HISTORY['url']         = 'http://localhost:9200';
+// $HISTORY['types']       = ['uint', 'text'];
+
+// Used for SAML authentication.
+// Uncomment to override the default paths to SP private key, SP and IdP X.509 certificates, and to set extra settings.
+//$SSO['SP_KEY']            = 'conf/certs/sp.key';
+//$SSO['SP_CERT']           = 'conf/certs/sp.crt';
+//$SSO['IDP_CERT']          = 'conf/certs/idp.crt';
+//$SSO['SETTINGS']          = [];

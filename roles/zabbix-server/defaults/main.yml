@@ -1,0 +1,43 @@
+---
+# Defaults for the `zabbix-server` role.
+# Secrets come from vault.yml; other settings can be overridden in group_vars.
+
+# --- Database ---
+zabbix_db_name: zabbix
+zabbix_db_user: zabbix
+zabbix_db_password: "{{ vault_zabbix_db_password | default('CHANGEME_generate_strong_password') }}"
+zabbix_db_host: localhost
+zabbix_db_port: 5432
+
+# --- Zabbix server daemon ---
+zabbix_server_listen_port: 10051
+zabbix_server_log_file: /var/log/zabbix/zabbix_server.log
+zabbix_server_log_file_size: 10
+zabbix_server_pid_file: /run/zabbix/zabbix_server.pid
+zabbix_server_socket_dir: /run/zabbix
+zabbix_server_start_pollers: 5
+zabbix_server_start_trappers: 5
+zabbix_server_cache_size: "8M"
+zabbix_server_history_cache_size: "16M"
+zabbix_server_trend_cache_size: "4M"
+zabbix_server_value_cache_size: "8M"
+
+# --- Web frontend (Nginx + PHP-FPM) ---
+zabbix_frontend_web_port: 8080
+zabbix_frontend_server_name: "_"
+zabbix_frontend_php_timezone: "{{ timezone | default('UTC') }}"
+zabbix_frontend_php_memory_limit: "128M"
+zabbix_frontend_php_post_max_size: "16M"
+zabbix_frontend_php_upload_max_filesize: "2M"
+zabbix_frontend_php_max_execution_time: 300
+zabbix_frontend_php_max_input_time: 300
+zabbix_frontend_display_name: "monitoring-lab"
+
+# --- Admin user rotation ---
+zabbix_admin_username: Admin
+zabbix_admin_password: "{{ vault_zabbix_admin_password | default('CHANGEME_generate_strong_password') }}"
+
+# --- Placeholder values that MUST be replaced before running ---
+zabbix_placeholder_values:
+  - "CHANGEME_generate_strong_password"
+  - "CHANGEME"

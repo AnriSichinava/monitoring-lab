@@ -1,0 +1,25 @@
+---
+- name: Ensure zabbix-server is enabled and running
+  ansible.builtin.systemd:
+    name: zabbix-server
+    enabled: true
+    state: started
+
+- name: Ensure nginx is enabled and running
+  ansible.builtin.systemd:
+    name: nginx
+    enabled: true
+    state: started
+
+- name: Detect installed PHP-FPM service name
+  ansible.builtin.shell: |
+    systemctl list-unit-files 'php*-fpm.service' --no-legend | awk '{print $1}' | head -1
+  register: php_fpm_service
+  changed_when: false
+
+- name: Ensure PHP-FPM is enabled and running
+  ansible.builtin.systemd:
+    name: "{{ php_fpm_service.stdout }}"
+    enabled: true
+    state: started
+  when: php_fpm_service.stdout | length > 0

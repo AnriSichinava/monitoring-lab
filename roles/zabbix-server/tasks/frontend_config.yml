@@ -1,0 +1,40 @@
+---
+- name: Detect PHP-FPM socket path
+  ansible.builtin.shell: |
+    ls /run/php/php*-fpm.sock 2>/dev/null | head -1
+  register: php_fpm_sock
+  changed_when: false
+  failed_when: php_fpm_sock.stdout == ""
+
+- name: Set PHP-FPM socket fact
+  ansible.builtin.set_fact:
+    zabbix_php_fpm_socket: "{{ php_fpm_sock.stdout }}"
+
+- name: Deploy Nginx vhost for Zabbix frontend
+  ansible.builtin.template:
+    src: nginx-zabbix.conf.j2
+    dest: /etc/zabbix/nginx.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload nginx
+
+- name: Deploy PHP frontend config (zabbix.conf.php)
+  ansible.builtin.template:
+    src: zabbix.conf.php.j2
+    dest: /etc/zabbix/web/zabbix.conf.php
+    owner: root
+    group: www-data
+    mode: "0640"   # contains DB password
+  no_log: true
+
+- name: Set PHP-FPM timezone for Zabbix pool
+  community.general.ini_file:
+    path: "{{ zabbix_php_fpm_socket | regex_replace('/run/php/(php[0-9.]+)-fpm\\.sock', '/etc/php/\\1/fpm/pool.d/zabbix.conf') }}"
+    section: "www"
+    option: "php_value[date.timezone]"
+    value: "{{ zabbix_frontend_php_timezone }}"
+    create: false
+    no_extra_spaces: true
+  notify: Restart php-fpm
+  failed_when: false   # pool.d/zabbix.conf may not exist on all Zabbix versions; the frontend also reads timezone from zabbix.conf.php

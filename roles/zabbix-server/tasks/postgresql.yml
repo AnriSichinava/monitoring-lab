@@ -1,0 +1,40 @@
+---
+- name: Ensure PostgreSQL is running (needed before we can create DB/user)
+  ansible.builtin.systemd:
+    name: postgresql
+    enabled: true
+    state: started
+
+- name: Create Zabbix PostgreSQL user
+  community.postgresql.postgresql_user:
+    name: "{{ zabbix_db_user }}"
+    password: "{{ zabbix_db_password }}"
+    encrypted: true
+    state: present
+  become: true
+  become_user: postgres
+  no_log: true
+
+- name: Create Zabbix database owned by zabbix user
+  community.postgresql.postgresql_db:
+    name: "{{ zabbix_db_name }}"
+    owner: "{{ zabbix_db_user }}"
+    encoding: UTF-8
+    lc_collate: "en_US.UTF-8"
+    lc_ctype: "en_US.UTF-8"
+    template: template0
+    state: present
+  become: true
+  become_user: postgres
+
+- name: Ensure Zabbix user can log in from localhost with password
+  community.postgresql.postgresql_pg_hba:
+    dest: /etc/postgresql/{{ ansible_facts.services['postgresql.service'].name | default('postgresql') | regex_replace('.*') }}/main/pg_hba.conf
+    contype: host
+    users: "{{ zabbix_db_user }}"
+    databases: "{{ zabbix_db_name }}"
+    method: scram-sha-256
+    address: 127.0.0.1/32
+    state: present
+    create: false
+  when: false   # pg_hba on Ubuntu default already allows md5/scram from localhost; leaving here as a hook for later hardening

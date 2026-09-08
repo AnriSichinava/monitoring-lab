@@ -1,0 +1,40 @@
+---
+- name: Assert secrets are not placeholder values
+  ansible.builtin.assert:
+    that:
+      - zabbix_db_password not in zabbix_placeholder_values
+      - zabbix_admin_password not in zabbix_placeholder_values
+    fail_msg: >-
+      vault_zabbix_db_password and vault_zabbix_admin_password must be set to real values
+      in inventories/production/group_vars/vault.yml before running this role.
+      See roles/zabbix-server/README.md for instructions on encrypting with Ansible Vault.
+    quiet: true
+  tags: [always]
+
+- name: Install packages (PostgreSQL, Zabbix server, PHP stack, Nginx)
+  ansible.builtin.include_tasks: packages.yml
+  tags: [zabbix_server, packages]
+
+- name: Configure PostgreSQL database and user
+  ansible.builtin.include_tasks: postgresql.yml
+  tags: [zabbix_server, postgres, db]
+
+- name: Import Zabbix schema (first run only)
+  ansible.builtin.include_tasks: schema.yml
+  tags: [zabbix_server, schema, db]
+
+- name: Deploy zabbix_server.conf
+  ansible.builtin.include_tasks: server_config.yml
+  tags: [zabbix_server, config]
+
+- name: Deploy Nginx vhost and PHP frontend config
+  ansible.builtin.include_tasks: frontend_config.yml
+  tags: [zabbix_server, frontend, nginx]
+
+- name: Rotate default admin password (one-time)
+  ansible.builtin.include_tasks: admin_password.yml
+  tags: [zabbix_server, admin_password, security]
+
+- name: Enable and start services
+  ansible.builtin.include_tasks: services.yml
+  tags: [zabbix_server, services]

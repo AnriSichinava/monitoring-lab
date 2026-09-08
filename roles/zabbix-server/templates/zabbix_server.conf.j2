@@ -1,0 +1,42 @@
+# {{ ansible_managed }}
+# monitoring-lab / zabbix-server role — Zabbix server daemon configuration
+
+# --- Connection to database ---
+DBHost={{ zabbix_db_host }}
+DBName={{ zabbix_db_name }}
+DBUser={{ zabbix_db_user }}
+DBPassword={{ zabbix_db_password }}
+DBPort={{ zabbix_db_port }}
+
+# --- Listen ---
+ListenPort={{ zabbix_server_listen_port }}
+
+# --- Logging ---
+LogFile={{ zabbix_server_log_file }}
+LogFileSize={{ zabbix_server_log_file_size }}
+LogType=file
+
+# --- Runtime ---
+PidFile={{ zabbix_server_pid_file }}
+SocketDir={{ zabbix_server_socket_dir }}
+
+# --- Pollers / trappers ---
+StartPollers={{ zabbix_server_start_pollers }}
+StartTrappers={{ zabbix_server_start_trappers }}
+
+# --- Caches ---
+CacheSize={{ zabbix_server_cache_size }}
+HistoryCacheSize={{ zabbix_server_history_cache_size }}
+TrendCacheSize={{ zabbix_server_trend_cache_size }}
+ValueCacheSize={{ zabbix_server_value_cache_size }}
+
+# --- SNMP ---
+StartSNMPTrapper=0
+
+# --- External scripts ---
+ExternalScripts=/usr/lib/zabbix/externalscripts
+FpingLocation=/usr/bin/fping
+Fping6Location=/usr/bin/fping6
+
+# --- Timeouts ---
+Timeout=4

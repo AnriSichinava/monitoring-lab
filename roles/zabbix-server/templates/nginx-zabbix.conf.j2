@@ -1,0 +1,75 @@
+# {{ ansible_managed }}
+# monitoring-lab / zabbix-server role — Nginx vhost for Zabbix frontend
+
+server {
+    listen {{ zabbix_frontend_web_port }};
+    listen [::]:{{ zabbix_frontend_web_port }};
+
+    server_name {{ zabbix_frontend_server_name }};
+
+    root /usr/share/zabbix;
+
+    index index.php;
+
+    location = /favicon.ico {
+        log_not_found off;
+    }
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /assets {
+        access_log off;
+        expires 10d;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+    location ~ /(api\/|conf[^\.]|include|locale) {
+        deny all;
+        return 404;
+    }
+
+    location /vendor {
+        deny all;
+        return 404;
+    }
+
+    location ~ [^/]\.php(/|$) {
+        fastcgi_pass unix:{{ zabbix_php_fpm_socket }};
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_index index.php;
+
+        fastcgi_param DOCUMENT_ROOT    /usr/share/zabbix;
+        fastcgi_param SCRIPT_FILENAME  /usr/share/zabbix$fastcgi_script_name;
+        fastcgi_param PATH_TRANSLATED  /usr/share/zabbix$fastcgi_script_name;
+
+        include fastcgi_params;
+        fastcgi_param QUERY_STRING     $query_string;
+        fastcgi_param REQUEST_METHOD   $request_method;
+        fastcgi_param CONTENT_TYPE     $content_type;
+        fastcgi_param CONTENT_LENGTH   $content_length;
+        fastcgi_intercept_errors        on;
+        fastcgi_ignore_client_abort     off;
+        fastcgi_connect_timeout         60;
+        fastcgi_send_timeout            180;
+        fastcgi_read_timeout            180;
+        fastcgi_buffer_size             128k;
+        fastcgi_buffers                 4 256k;
+        fastcgi_busy_buffers_size       256k;
+        fastcgi_temp_file_write_size    256k;
+
+        fastcgi_param PHP_VALUE "
+            max_execution_time = {{ zabbix_frontend_php_max_execution_time }}
+            memory_limit = {{ zabbix_frontend_php_memory_limit }}
+            post_max_size = {{ zabbix_frontend_php_post_max_size }}
+            upload_max_filesize = {{ zabbix_frontend_php_upload_max_filesize }}
+            max_input_time = {{ zabbix_frontend_php_max_input_time }}
+            max_input_vars = 10000
+            date.timezone = {{ zabbix_frontend_php_timezone }}
+        ";
+    }
+}

@@ -26,13 +26,20 @@
   ansible.builtin.include_tasks: provisioning.yml
   tags: [grafana, provisioning]
 
-- name: Rotate admin password (one-time)
-  ansible.builtin.include_tasks: admin_password.yml
-  tags: [grafana, admin_password, security]
-
+# Start the service BEFORE admin_password.yml — the password rotation hits the
+# Grafana API, which needs the service listening on port 3000. On first-install
+# runs the apt post-install script usually starts it, but we can't rely on that
+# if earlier tasks caused a restart or state mismatch.
 - name: Ensure Grafana is enabled and running
   ansible.builtin.systemd:
     name: grafana-server
     enabled: true
     state: started
   tags: [grafana, services]
+
+- name: Flush handlers to apply any pending config changes before hitting the API
+  ansible.builtin.meta: flush_handlers
+
+- name: Rotate admin password (one-time)
+  ansible.builtin.include_tasks: admin_password.yml
+  tags: [grafana, admin_password, security]

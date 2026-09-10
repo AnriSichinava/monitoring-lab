@@ -18,7 +18,21 @@
   check_mode: false
 
 - name: Install Grafana plugins
-  ansible.builtin.command: "grafana-cli plugins install {{ item }}"
+  # --pluginsDir is required for `plugins install` to find its target dir when run
+  # from an arbitrary working directory (Ansible's default). Without it, grafana-cli
+  # tries to auto-detect from a homepath and fails with "Could not find config defaults".
+  ansible.builtin.command: "grafana-cli --pluginsDir /var/lib/grafana/plugins plugins install {{ item }}"
   loop: "{{ grafana_plugins }}"
   when: item not in grafana_installed_plugins.stdout
   notify: Restart grafana-server
+
+- name: Ensure plugin files are owned by grafana user
+  # grafana-cli installs plugins as whoever ran it (root, via become). Grafana
+  # server runs as the `grafana` user, so it needs read access. Chown fixes ownership
+  # recursively across whatever the plugins installer created.
+  ansible.builtin.file:
+    path: /var/lib/grafana/plugins
+    state: directory
+    owner: grafana
+    group: grafana
+    recurse: true

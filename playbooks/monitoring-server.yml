@@ -6,6 +6,7 @@
   become: true
   roles:
     - common
+    - firewall
     - zabbix-server
     - zabbix-agent   # server monitors itself
     # - victoriametrics

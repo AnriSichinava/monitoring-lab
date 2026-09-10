@@ -1,0 +1,5 @@
+---
+- name: Persist iptables rules
+  ansible.builtin.command: netfilter-persistent save
+  when: firewall_persist_rules
+  changed_when: true

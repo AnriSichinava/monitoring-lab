@@ -1,0 +1,5 @@
+---
+# Vars applied to every host in the `monitoring_targets` group.
+
+firewall_allowed_tcp_ports:
+  - { port: 10050, source: "10.0.0.0/16" }      # Zabbix agent — server pulls from us

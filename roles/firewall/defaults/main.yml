@@ -1,0 +1,13 @@
+---
+# Defaults for the `firewall` role.
+# Each host declares which TCP ports it needs open in group_vars/host_vars.
+# Empty by default — a host with no declared ports gets no changes.
+
+# List of TCP ports to open on the INPUT chain.
+# Each entry can be an integer (opens 0.0.0.0/0) or a dict for finer control:
+#   - 8080                                              # allow all sources
+#   - { port: 10050, source: "10.0.0.0/16" }            # restrict to VCN
+firewall_allowed_tcp_ports: []
+
+# Persist rules across reboot via netfilter-persistent (installed by default on Oracle Ubuntu).
+firewall_persist_rules: true

@@ -6,5 +6,6 @@
   become: true
   roles:
     - common
+    - firewall
     - zabbix-agent
     # - telegraf

@@ -1,0 +1,28 @@
+---
+- name: Ensure iptables and netfilter-persistent are installed
+  ansible.builtin.apt:
+    name:
+      - iptables
+      - iptables-persistent
+      - netfilter-persistent
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  tags: [firewall, packages]
+
+- name: Insert ACCEPT rules for declared TCP ports
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ (item.port | default(item)) | string }}"
+    source: "{{ item.source | default(omit) }}"
+    jump: ACCEPT
+    action: insert
+    rule_num: "1"
+    comment: "monitoring-lab: {{ item.port | default(item) }}"
+    state: present
+  loop: "{{ firewall_allowed_tcp_ports }}"
+  loop_control:
+    label: "{{ item.port | default(item) }}"
+  notify: Persist iptables rules
+  tags: [firewall, rules]

@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  role_name: firewall
+  author: Anri Sitchinava
+  description: Declaratively open TCP ports on the iptables INPUT chain, idempotent + persisted
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+  galaxy_tags:
+    - system
+    - security
+    - firewall
+    - iptables
+
+dependencies:
+  - role: common

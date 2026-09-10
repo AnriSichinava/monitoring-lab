@@ -1,4 +1,16 @@
 ---
+# Grafana's install package doesn't create /var/lib/grafana/plugins until the
+# grafana-server service first starts. We install plugins BEFORE the first
+# service start (so plugins are loaded on initial boot), which means the dir
+# doesn't exist yet — create it explicitly with the right ownership.
+- name: Ensure Grafana plugins directory exists
+  ansible.builtin.file:
+    path: /var/lib/grafana/plugins
+    state: directory
+    owner: grafana
+    group: grafana
+    mode: "0755"
+
 - name: Check which Grafana plugins are already installed
   ansible.builtin.command: grafana-cli plugins ls
   register: grafana_installed_plugins

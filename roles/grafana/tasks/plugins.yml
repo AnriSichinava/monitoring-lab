@@ -18,10 +18,13 @@
   check_mode: false
 
 - name: Install Grafana plugins
-  # --pluginsDir is required for `plugins install` to find its target dir when run
-  # from an arbitrary working directory (Ansible's default). Without it, grafana-cli
-  # tries to auto-detect from a homepath and fails with "Could not find config defaults".
-  ansible.builtin.command: "grafana-cli --pluginsDir /var/lib/grafana/plugins plugins install {{ item }}"
+  # grafana-cli needs BOTH:
+  # - --homepath (where Grafana is installed, for config-defaults lookup)
+  # - --pluginsDir (where installed plugin files go)
+  # Auto-detection works only when run from Grafana's homepath dir; safer to be explicit.
+  ansible.builtin.command:
+    cmd: "grafana-cli --homepath /usr/share/grafana --pluginsDir /var/lib/grafana/plugins plugins install {{ item }}"
+    chdir: /usr/share/grafana
   loop: "{{ grafana_plugins }}"
   when: item not in grafana_installed_plugins.stdout
   notify: Restart grafana-server

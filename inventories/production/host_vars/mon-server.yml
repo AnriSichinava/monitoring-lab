@@ -1,0 +1,8 @@
+---
+# Per-host overrides for mon-server.
+# mon-server runs BOTH the Zabbix server and a Zabbix agent (self-monitor).
+# The server connects to the local agent over loopback, so the agent's Server
+# whitelist must include 127.0.0.1 alongside the public IP.
+
+zabbix_agent_server_list: "127.0.0.1,{{ zabbix_server_ip }}"
+zabbix_agent_server_active: "127.0.0.1"

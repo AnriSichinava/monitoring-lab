@@ -17,7 +17,7 @@ zabbix_server_pid_file: /run/zabbix/zabbix_server.pid
 zabbix_server_socket_dir: /run/zabbix
 zabbix_server_start_pollers: 5
 zabbix_server_start_trappers: 5
-zabbix_server_cache_size: "8M"
+zabbix_server_cache_size: "32M"   # 8M is Zabbix's shipped default but crashes on startup for Zabbix 7 (config cache demand grew); 32M is the practical minimum for a lab
 zabbix_server_history_cache_size: "16M"
 zabbix_server_trend_cache_size: "4M"
 zabbix_server_value_cache_size: "8M"

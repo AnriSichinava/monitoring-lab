@@ -2,10 +2,10 @@
 # monitoring-lab / zabbix-agent role — Zabbix Agent 2 configuration
 
 # Zabbix server(s) allowed to connect for passive checks (server pulls from us).
-Server={{ zabbix_server_ip }}
+Server={{ zabbix_agent_server_list }}
 
 # Zabbix server(s) for active checks (we push to server).
-ServerActive={{ zabbix_server_ip }}
+ServerActive={{ zabbix_agent_server_active }}
 
 # Hostname this agent reports as. Must match a host entry in Zabbix UI.
 Hostname={{ zabbix_agent_hostname }}

@@ -6,10 +6,16 @@
 zabbix_major_version: "7.0"
 zabbix_release_deb_version: "7.0-2"
 
-# Where this agent reports metrics.
-# By default, resolves to the first host in the `monitoring_servers` inventory group.
-# Override per-host or per-group if the agent should talk to a different Zabbix server.
+# Which Zabbix server(s) this agent reports to.
+# `zabbix_agent_server_list` = passive-check whitelist (comma-separated) — server IPs allowed to pull from the agent.
+# `zabbix_agent_server_active` = active-check target — the one server the agent pushes to.
+#
+# Default assumes the agent talks to the first host in the `monitoring_servers` group.
+# For the mon-server itself (self-monitor), override in host_vars/mon-server.yml to add 127.0.0.1,
+# since the Zabbix server connects to its local agent over loopback.
 zabbix_server_ip: "{{ hostvars[groups['monitoring_servers'][0]].ansible_host }}"
+zabbix_agent_server_list: "{{ zabbix_server_ip }}"
+zabbix_agent_server_active: "{{ zabbix_server_ip }}"
 
 # How this host identifies itself to Zabbix. Must match a host defined in Zabbix UI.
 zabbix_agent_hostname: "{{ inventory_hostname }}"

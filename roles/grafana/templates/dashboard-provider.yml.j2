@@ -1,0 +1,17 @@
+# {{ ansible_managed }}
+# monitoring-lab / grafana role — dashboard provider
+# Tells Grafana to load every .json file under /var/lib/grafana/dashboards as a dashboard.
+
+apiVersion: 1
+
+providers:
+  - name: monitoring-lab
+    orgId: 1
+    folder: 'monitoring-lab'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

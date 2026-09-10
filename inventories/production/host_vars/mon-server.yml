@@ -9,6 +9,7 @@ zabbix_agent_server_active: "127.0.0.1"
 
 # TCP ports opened by the `firewall` role.
 firewall_allowed_tcp_ports:
+  - 3000                                        # Grafana UI — public
   - 8080                                        # Zabbix web UI — public
   - { port: 10050, source: "10.0.0.0/16" }      # Zabbix agent — VCN-internal (agent only pulled by local server)
   - { port: 10051, source: "10.0.0.0/16" }      # Zabbix server — VCN-internal (targets push active checks here)

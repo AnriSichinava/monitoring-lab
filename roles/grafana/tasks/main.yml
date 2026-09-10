@@ -1,0 +1,38 @@
+---
+- name: Assert secrets are not placeholder values
+  ansible.builtin.assert:
+    that:
+      - grafana_admin_password not in grafana_placeholder_values
+      - grafana_zabbix_api_password not in grafana_placeholder_values
+    fail_msg: >-
+      vault_grafana_admin_password and vault_zabbix_api_password must be set to real values
+      in inventories/production/group_vars/all/vault.yml before running this role.
+    quiet: true
+  tags: [always]
+
+- name: Install Grafana APT repo and package
+  ansible.builtin.include_tasks: install.yml
+  tags: [grafana, packages]
+
+- name: Install Grafana plugins
+  ansible.builtin.include_tasks: plugins.yml
+  tags: [grafana, plugins]
+
+- name: Deploy grafana.ini
+  ansible.builtin.include_tasks: config.yml
+  tags: [grafana, config]
+
+- name: Provision datasources and dashboards
+  ansible.builtin.include_tasks: provisioning.yml
+  tags: [grafana, provisioning]
+
+- name: Rotate admin password (one-time)
+  ansible.builtin.include_tasks: admin_password.yml
+  tags: [grafana, admin_password, security]
+
+- name: Ensure Grafana is enabled and running
+  ansible.builtin.systemd:
+    name: grafana-server
+    enabled: true
+    state: started
+  tags: [grafana, services]

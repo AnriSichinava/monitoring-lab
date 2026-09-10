@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+# monitoring-lab / grafana role — Zabbix datasource (provisioned)
+# Loaded by Grafana on startup from /etc/grafana/provisioning/datasources/
+
+apiVersion: 1
+
+datasources:
+  - name: {{ grafana_zabbix_datasource_name }}
+    type: alexanderzobnin-zabbix-datasource
+    access: proxy
+    url: {{ grafana_zabbix_datasource_url }}
+    isDefault: true
+    jsonData:
+      username: {{ grafana_zabbix_api_user }}
+      trends: true
+      trendsFrom: "7d"
+      trendsRange: "4d"
+      cacheTTL: "1h"
+      timeout: 30
+      keepCookies: []
+    secureJsonData:
+      password: {{ grafana_zabbix_api_password }}
+    editable: false

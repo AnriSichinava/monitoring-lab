@@ -1,0 +1,27 @@
+---
+# Defaults for the `grafana` role.
+
+# --- Grafana web ---
+grafana_listen_port: 3000
+grafana_domain: "{{ ansible_host | default('localhost') }}"
+grafana_root_url: "http://{{ grafana_domain }}:{{ grafana_listen_port }}/"
+
+# --- Admin user ---
+grafana_admin_username: admin
+grafana_admin_password: "{{ vault_grafana_admin_password | default('CHANGEME_generate_strong_password') }}"
+
+# --- Zabbix datasource (Grafana calls Zabbix API to query data) ---
+# The plugin talks to Zabbix over HTTP to the frontend URL — same URL you use in a browser.
+grafana_zabbix_datasource_name: "Zabbix"
+grafana_zabbix_datasource_url: "http://127.0.0.1:{{ zabbix_frontend_web_port | default(8080) }}/api_jsonrpc.php"
+grafana_zabbix_api_user: "{{ vault_zabbix_api_user | default('grafana-api') }}"
+grafana_zabbix_api_password: "{{ vault_zabbix_api_password | default('CHANGEME_generate_strong_password') }}"
+
+# --- Placeholders that must be replaced before running ---
+grafana_placeholder_values:
+  - "CHANGEME_generate_strong_password"
+  - "CHANGEME"
+
+# --- Plugins to install (grafana-cli plugins install <name>) ---
+grafana_plugins:
+  - alexanderzobnin-zabbix-app

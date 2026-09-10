@@ -1,0 +1,50 @@
+---
+- name: Ensure provisioning directories exist
+  ansible.builtin.file:
+    path: "/etc/grafana/provisioning/{{ item }}"
+    state: directory
+    owner: root
+    group: grafana
+    mode: "0755"
+  loop:
+    - datasources
+    - dashboards
+
+- name: Ensure dashboard JSON directory exists
+  ansible.builtin.file:
+    path: /var/lib/grafana/dashboards
+    state: directory
+    owner: root
+    group: grafana
+    mode: "0755"
+
+- name: Deploy Zabbix datasource provisioning file
+  ansible.builtin.template:
+    src: datasource-zabbix.yml.j2
+    dest: /etc/grafana/provisioning/datasources/zabbix.yml
+    owner: root
+    group: grafana
+    mode: "0640"
+  notify: Restart grafana-server
+  no_log: true
+
+- name: Deploy dashboard provider config
+  ansible.builtin.template:
+    src: dashboard-provider.yml.j2
+    dest: /etc/grafana/provisioning/dashboards/monitoring-lab.yml
+    owner: root
+    group: grafana
+    mode: "0640"
+  notify: Restart grafana-server
+
+- name: Deploy dashboard JSON files
+  ansible.builtin.copy:
+    src: "dashboards/{{ item }}"
+    dest: "/var/lib/grafana/dashboards/{{ item }}"
+    owner: root
+    group: grafana
+    mode: "0644"
+  loop:
+    - infra-overview.json
+    - per-host-deep-dive.json
+  notify: Restart grafana-server

@@ -1,0 +1,12 @@
+---
+- name: Check which Grafana plugins are already installed
+  ansible.builtin.command: grafana-cli plugins ls
+  register: grafana_installed_plugins
+  changed_when: false
+  check_mode: false
+
+- name: Install Grafana plugins
+  ansible.builtin.command: "grafana-cli plugins install {{ item }}"
+  loop: "{{ grafana_plugins }}"
+  when: item not in grafana_installed_plugins.stdout
+  notify: Restart grafana-server

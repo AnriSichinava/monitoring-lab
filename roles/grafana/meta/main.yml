@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  role_name: grafana
+  author: Anri Sitchinava
+  description: Install Grafana OSS + zabbix-grafana plugin, provision Zabbix datasource + dashboards
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+  galaxy_tags:
+    - monitoring
+    - grafana
+    - dashboards
+    - zabbix
+
+dependencies:
+  - role: common

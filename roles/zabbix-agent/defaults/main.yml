@@ -10,10 +10,14 @@ zabbix_release_deb_version: "7.0-2"
 # `zabbix_agent_server_list` = passive-check whitelist (comma-separated) — server IPs allowed to pull from the agent.
 # `zabbix_agent_server_active` = active-check target — the one server the agent pushes to.
 #
-# Default assumes the agent talks to the first host in the `monitoring_servers` group.
-# For the mon-server itself (self-monitor), override in host_vars/mon-server.yml to add 127.0.0.1,
-# since the Zabbix server connects to its local agent over loopback.
-zabbix_server_ip: "{{ hostvars[groups['monitoring_servers'][0]].ansible_host }}"
+# Resolves to the FIRST monitoring server's PRIVATE IP (VCN-internal), because:
+# - When mon-server pulls from a target, the source address on the wire is mon-server's private IP
+#   (traffic goes VCN-internal, not through the internet gateway)
+# - Zabbix agent's `Server=` line whitelists source IPs of incoming pulls; must match what the wire shows
+# - Using the public IP here would work for cross-region setups, but is wrong for same-VCN targets
+#
+# Override in host_vars/mon-server.yml for self-monitor (adds 127.0.0.1 alongside).
+zabbix_server_ip: "{{ hostvars[groups['monitoring_servers'][0]].private_ip }}"
 zabbix_agent_server_list: "{{ zabbix_server_ip }}"
 zabbix_agent_server_active: "{{ zabbix_server_ip }}"
 

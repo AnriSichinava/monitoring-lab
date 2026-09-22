@@ -11,6 +11,10 @@
     quiet: true
   tags: [always]
 
+- name: Configure Zabbix APT repository
+  ansible.builtin.include_tasks: repo.yml
+  tags: [zabbix_server, repo]
+
 - name: Install packages (PostgreSQL, Zabbix server, PHP stack, Nginx)
   ansible.builtin.include_tasks: packages.yml
   tags: [zabbix_server, packages]

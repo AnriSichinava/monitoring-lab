@@ -1,0 +1,73 @@
+---
+- name: Wait for Zabbix API to accept requests (first run only)
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ zabbix_frontend_web_port }}/api_jsonrpc.php"
+    method: POST
+    headers:
+      Content-Type: application/json-rpc
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: apiinfo.version
+      params: {}
+      id: 1
+    status_code: 200
+  register: zabbix_api_check
+  until: zabbix_api_check.status == 200
+  retries: 30
+  delay: 2
+
+# community.zabbix >= 2.x authenticates over the httpapi connection plugin,
+# not via server_url/login_user/login_password module args. Override the
+# connection for just this block so the rest of the role keeps using ssh.
+- name: Register Zabbix host group + hosts via API
+  no_log: true
+  become: false # this block runs locally over the httpapi connection, not via SSH — no root needed
+  vars:
+    ansible_connection: httpapi
+    ansible_network_os: community.zabbix.zabbix
+    ansible_httpapi_port: "{{ zabbix_frontend_web_port }}"
+    ansible_httpapi_use_ssl: false
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: "" # our nginx vhost serves Zabbix at root, not /zabbix
+    ansible_user: "{{ zabbix_admin_username }}"
+    ansible_httpapi_pass: "{{ zabbix_admin_password }}"
+  block:
+    - name: Ensure "monitoring-lab" host group exists
+      community.zabbix.zabbix_group:
+        host_groups:
+          - monitoring-lab
+        state: present
+
+    - name: Register mon-server (self-monitor) in Zabbix
+      community.zabbix.zabbix_host:
+        host_name: "{{ inventory_hostname }}"
+        host_groups:
+          - monitoring-lab
+        link_templates:
+          - "Linux by Zabbix agent"
+        interfaces:
+          - type: agent
+            main: 1
+            useip: 1
+            ip: 127.0.0.1
+            port: "{{ zabbix_agent_listen_port | default(10050) | string }}"
+        status: enabled
+        state: present
+
+    - name: Register monitoring targets in Zabbix
+      community.zabbix.zabbix_host:
+        host_name: "{{ item }}"
+        host_groups:
+          - monitoring-lab
+        link_templates:
+          - "Linux by Zabbix agent"
+        interfaces:
+          - type: agent
+            main: 1
+            useip: 1
+            ip: "{{ hostvars[item].private_ip }}"
+            port: "10050"
+        status: enabled
+        state: present
+      loop: "{{ groups['monitoring_targets'] }}"

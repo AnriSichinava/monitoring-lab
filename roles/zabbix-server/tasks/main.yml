@@ -42,3 +42,7 @@
 - name: Enable and start services
   ansible.builtin.include_tasks: services.yml
   tags: [zabbix_server, services]
+
+- name: Register hosts + host group in Zabbix via API
+  ansible.builtin.include_tasks: host_registration.yml
+  tags: [zabbix_server, host_registration, api]

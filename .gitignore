@@ -5,6 +5,7 @@
 *.vault
 !vault.yml
 inventories/**/host_vars/**/vault.yml.decrypted
+.facts_cache/
 
 # Python (virtualenvs, caches, packages)
 __pycache__/

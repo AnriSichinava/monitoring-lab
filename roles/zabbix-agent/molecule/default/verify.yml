@@ -1,0 +1,32 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert zabbix-agent2 package is installed
+      ansible.builtin.assert:
+        that:
+          - "'zabbix-agent2' in ansible_facts.packages"
+        fail_msg: "zabbix-agent2 package was not installed"
+
+    - name: Read deployed zabbix_agent2.conf
+      ansible.builtin.slurp:
+        src: /etc/zabbix/zabbix_agent2.conf
+      register: agent_conf_raw
+
+    - name: Assert config points at the overridden Zabbix server
+      ansible.builtin.assert:
+        that:
+          - "'Server=127.0.0.1' in (agent_conf_raw.content | b64decode)"
+          - "'ServerActive=127.0.0.1' in (agent_conf_raw.content | b64decode)"
+        fail_msg: "zabbix_agent2.conf does not reference the expected server IP"
+
+    - name: Check zabbix-agent2 service is active
+      ansible.builtin.command: systemctl is-active zabbix-agent2
+      register: agent_service_status
+      changed_when: false
+      failed_when: agent_service_status.stdout != "active"

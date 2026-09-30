@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 640" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#555"/>
+    </marker>
+  </defs>
+
+  <style>
+    .box { fill: #ffffff; stroke: #333; stroke-width: 1.5; rx: 6; }
+    .server-box { fill: #eef4ff; stroke: #2b5bb8; stroke-width: 1.5; rx: 6; }
+    .target-box { fill: #eefaf0; stroke: #2f8f4e; stroke-width: 1.5; rx: 6; }
+    .cloud-box { fill: #fdf6e3; stroke: #b8860b; stroke-width: 1.5; stroke-dasharray: 4,3; rx: 10; }
+    .label { font-size: 13px; fill: #222; }
+    .title { font-size: 15px; font-weight: 600; fill: #111; }
+    .small { font-size: 11px; fill: #555; }
+    .flow { stroke: #555; stroke-width: 1.6; fill: none; marker-end: url(#arrow); }
+    .flow-dashed { stroke: #888; stroke-width: 1.4; fill: none; stroke-dasharray: 5,4; marker-end: url(#arrow); }
+  </style>
+
+  <rect width="980" height="640" fill="#ffffff"/>
+  <text x="20" y="28" class="title" font-size="18">monitoring-lab — architecture</text>
+  <text x="20" y="46" class="small">Oracle Cloud Free Tier · Ansible-driven · Zabbix + Grafana + VictoriaMetrics</text>
+
+  <!-- Control node -->
+  <rect x="20" y="70" width="200" height="70" class="cloud-box"/>
+  <text x="120" y="95" class="label" text-anchor="middle" font-weight="600">Control node</text>
+  <text x="120" y="112" class="small" text-anchor="middle">Mac · Ansible 2.21</text>
+  <text x="120" y="127" class="small" text-anchor="middle">SSH (ed25519)</text>
+
+  <!-- VCN boundary -->
+  <rect x="270" y="70" width="690" height="540" class="cloud-box"/>
+  <text x="615" y="92" class="small" text-anchor="middle">vcn-monitoring-lab (10.0.0.0/16) — Oracle Cloud Free Tier, arm64</text>
+
+  <!-- mon-server -->
+  <rect x="300" y="115" width="330" height="330" class="server-box"/>
+  <text x="465" y="138" class="title" text-anchor="middle">mon-server</text>
+  <text x="465" y="153" class="small" text-anchor="middle">2 OCPU / 12GB — the only publicly reachable host</text>
+
+  <rect x="320" y="168" width="130" height="42" class="box"/>
+  <text x="385" y="185" class="label" text-anchor="middle">Zabbix server</text>
+  <text x="385" y="200" class="small" text-anchor="middle">:10051 trapper</text>
+
+  <rect x="470" y="168" width="130" height="42" class="box"/>
+  <text x="535" y="185" class="label" text-anchor="middle">PostgreSQL</text>
+  <text x="535" y="200" class="small" text-anchor="middle">Zabbix backend</text>
+
+  <rect x="320" y="222" width="130" height="42" class="box"/>
+  <text x="385" y="239" class="label" text-anchor="middle">Nginx + PHP-FPM</text>
+  <text x="385" y="254" class="small" text-anchor="middle">:8080 frontend</text>
+
+  <rect x="470" y="222" width="130" height="42" class="box"/>
+  <text x="535" y="239" class="label" text-anchor="middle">Zabbix agent2</text>
+  <text x="535" y="254" class="small" text-anchor="middle">self-monitor</text>
+
+  <rect x="320" y="276" width="280" height="42" class="box"/>
+  <text x="460" y="293" class="label" text-anchor="middle">Grafana</text>
+  <text x="460" y="308" class="small" text-anchor="middle">:3000 — 4 dashboards, queries Zabbix API</text>
+
+  <rect x="320" y="330" width="280" height="42" class="box"/>
+  <text x="460" y="347" class="label" text-anchor="middle">VictoriaMetrics</text>
+  <text x="460" y="362" class="small" text-anchor="middle">:8428 — long-term metrics store</text>
+
+  <text x="465" y="425" class="small" text-anchor="middle" font-style="italic">Custom Zabbix triggers + templates:</text>
+  <text x="465" y="440" class="small" text-anchor="middle" font-style="italic">Linux baseline · HTTP check · SSH log-triggers</text>
+
+  <!-- mon-target-1 -->
+  <rect x="670" y="130" width="270" height="140" class="target-box"/>
+  <text x="805" y="153" class="title" text-anchor="middle">mon-target-1</text>
+  <text x="805" y="168" class="small" text-anchor="middle">1 OCPU / 6GB — VCN-internal only</text>
+  <rect x="690" y="180" width="110" height="40" class="box"/>
+  <text x="745" y="200" class="label" text-anchor="middle" font-size="12">Zabbix agent2</text>
+  <rect x="810" y="180" width="110" height="40" class="box"/>
+  <text x="865" y="200" class="label" text-anchor="middle" font-size="12">Telegraf</text>
+
+  <!-- mon-target-2 -->
+  <rect x="670" y="290" width="270" height="140" class="target-box"/>
+  <text x="805" y="313" class="title" text-anchor="middle">mon-target-2</text>
+  <text x="805" y="328" class="small" text-anchor="middle">1 OCPU / 6GB — VCN-internal only</text>
+  <rect x="690" y="340" width="110" height="40" class="box"/>
+  <text x="745" y="360" class="label" text-anchor="middle" font-size="12">Zabbix agent2</text>
+  <rect x="810" y="340" width="110" height="40" class="box"/>
+  <text x="865" y="360" class="label" text-anchor="middle" font-size="12">Telegraf</text>
+
+  <!-- flows: control node to hosts -->
+  <path d="M220,105 C260,105 260,190 300,190" class="flow-dashed"/>
+  <path d="M220,110 C400,60 700,60 805,128" class="flow-dashed"/>
+  <text x="230" y="60" class="small">SSH (Ansible push)</text>
+
+  <!-- flows: agent pull -->
+  <path d="M670,200 C620,200 620,200 600,243" class="flow"/>
+  <text x="605" y="215" class="small" text-anchor="end">Zabbix pulls</text>
+  <text x="605" y="228" class="small" text-anchor="end">:10050</text>
+
+  <path d="M670,360 C620,360 620,360 600,243" class="flow"/>
+
+  <!-- flows: agent push (trapper) -->
+  <path d="M690,220 C550,220 460,220 400,210" class="flow-dashed"/>
+  <path d="M690,380 C550,300 460,220 400,210" class="flow-dashed"/>
+  <text x="630" y="255" class="small">active checks push :10051</text>
+
+  <!-- flows: telegraf push to VM -->
+  <path d="M865,220 C820,270 620,340 460,352" class="flow"/>
+  <path d="M865,340 C700,350 550,352 460,352" class="flow"/>
+  <text x="700" y="392" class="small">Telegraf push :8428</text>
+
+  <!-- Grafana queries -->
+  <path d="M460,297 C420,297 400,297 390,254" class="flow"/>
+  <path d="M460,297 C460,320 460,325 460,330" class="flow"/>
+  <text x="330" y="270" class="small" text-anchor="middle">Grafana queries Zabbix</text>
+
+  <!-- Slack (planned) -->
+  <rect x="720" y="480" width="220" height="60" class="box" stroke-dasharray="4,3"/>
+  <text x="830" y="503" class="label" text-anchor="middle">Slack #monitoring-lab-alerts</text>
+  <text x="830" y="520" class="small" text-anchor="middle" font-style="italic">planned — not yet wired</text>
+  <path d="M600,297 C650,380 680,440 720,495" class="flow-dashed"/>
+  <path d="M385,254 C450,400 600,460 720,510" class="flow-dashed"/>
+
+  <!-- Public access -->
+  <rect x="20" y="500" width="200" height="90" class="cloud-box"/>
+  <text x="120" y="525" class="label" text-anchor="middle" font-weight="600">Public internet</text>
+  <text x="120" y="545" class="small" text-anchor="middle">:8080 Zabbix UI</text>
+  <text x="120" y="560" class="small" text-anchor="middle">:3000 Grafana UI</text>
+  <text x="120" y="575" class="small" text-anchor="middle">(only mon-server exposed)</text>
+  <path d="M220,545 C260,500 300,300 320,250" class="flow"/>
+
+  <text x="20" y="620" class="small">Solid arrows = live data flow. Dashed = control-plane / planned.</text>
+</svg>

@@ -1,0 +1,20 @@
+---
+# Defaults for the `telegraf` role.
+# Telegraf collects host metrics and ships them to VictoriaMetrics
+# (running on mon-server) using the InfluxDB v1 line-protocol output —
+# VictoriaMetrics accepts this natively on its /write endpoint.
+
+telegraf_collection_interval: "15s"
+telegraf_flush_interval: "15s"
+telegraf_hostname: "{{ inventory_hostname }}"
+
+# VictoriaMetrics listens on mon-server's VCN-internal IP — same reasoning
+# as zabbix_server_ip in the zabbix-agent role: targets reach it over the
+# private network, not the public internet gateway.
+telegraf_victoriametrics_host: "{{ hostvars[groups['monitoring_servers'][0]].private_ip }}"
+telegraf_victoriametrics_port: 8428
+telegraf_victoriametrics_url: "http://{{ telegraf_victoriametrics_host }}:{{ telegraf_victoriametrics_port }}"
+
+# VictoriaMetrics ignores the database name on /write, but the InfluxDB v1
+# output plugin requires one to be set.
+telegraf_influxdb_database: telegraf

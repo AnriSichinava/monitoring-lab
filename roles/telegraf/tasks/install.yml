@@ -1,0 +1,5 @@
+---
+- name: Install telegraf
+  ansible.builtin.apt:
+    name: telegraf
+    state: present

@@ -1,0 +1,12 @@
+---
+- name: Configure InfluxData APT repository
+  ansible.builtin.include_tasks: repo.yml
+  tags: [telegraf, repo]
+
+- name: Install telegraf package
+  ansible.builtin.include_tasks: install.yml
+  tags: [telegraf, packages]
+
+- name: Deploy telegraf config and service
+  ansible.builtin.include_tasks: config.yml
+  tags: [telegraf, config]

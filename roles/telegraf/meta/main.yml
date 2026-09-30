@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  role_name: telegraf
+  author: Anri Sitchinava
+  description: Telegraf metrics collector shipping to VictoriaMetrics
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+  galaxy_tags:
+    - monitoring
+    - metrics
+    - telegraf
+
+dependencies: []

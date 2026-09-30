@@ -13,3 +13,4 @@ firewall_allowed_tcp_ports:
   - 8080                                        # Zabbix web UI — public
   - { port: 10050, source: "10.0.0.0/16" }      # Zabbix agent — VCN-internal (agent only pulled by local server)
   - { port: 10051, source: "10.0.0.0/16" }      # Zabbix server — VCN-internal (targets push active checks here)
+  - { port: 8428, source: "10.0.0.0/16" }       # VictoriaMetrics — VCN-internal (targets' Telegraf writes here)

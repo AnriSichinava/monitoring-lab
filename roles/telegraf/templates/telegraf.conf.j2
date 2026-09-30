@@ -1,0 +1,33 @@
+# Managed by Ansible — roles/telegraf. Manual edits will be overwritten.
+
+[agent]
+  interval = "{{ telegraf_collection_interval }}"
+  round_interval = true
+  flush_interval = "{{ telegraf_flush_interval }}"
+  hostname = "{{ telegraf_hostname }}"
+  omit_hostname = false
+
+[[outputs.influxdb]]
+  urls = ["{{ telegraf_victoriametrics_url }}"]
+  database = "{{ telegraf_influxdb_database }}"
+  skip_database_creation = true
+
+[[inputs.cpu]]
+  percpu = false
+  totalcpu = true
+  collect_cpu_time = false
+
+[[inputs.mem]]
+
+[[inputs.swap]]
+
+[[inputs.system]]
+
+[[inputs.disk]]
+  ignore_fs = ["tmpfs", "devtmpfs", "devfs", "overlay", "aufs", "squashfs"]
+
+[[inputs.diskio]]
+
+[[inputs.net]]
+
+[[inputs.processes]]

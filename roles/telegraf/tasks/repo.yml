@@ -1,0 +1,33 @@
+---
+- name: Ensure keyring directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure gnupg is installed (needed to dearmor the signing key)
+  ansible.builtin.apt:
+    name: gnupg
+    state: present
+
+- name: Download InfluxData APT signing key (ASCII-armored)
+  ansible.builtin.get_url:
+    url: https://repos.influxdata.com/influxdata-archive.key
+    dest: /tmp/influxdata-archive.key
+    mode: "0644"
+    force: true # small file, re-fetched each run to catch key rotation early
+
+- name: Dearmor InfluxData signing key into keyring format
+  ansible.builtin.command: >-
+    gpg --dearmor --yes --output /etc/apt/keyrings/influxdata-archive.gpg
+    /tmp/influxdata-archive.key
+  changed_when: true
+
+- name: Add InfluxData APT repo
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/influxdata-archive.gpg] https://repos.influxdata.com/debian stable main"
+    filename: influxdata
+    state: present
+    update_cache: true

@@ -7,7 +7,10 @@ collections:
   - name: ansible.posix
     version: ">=1.5.0"
   - name: community.postgresql
-    version: ">=3.0.0"
+    # 5.0.0 renamed postgresql_query's `db` param to `login_db` (breaking change) —
+    # pin below that until roles/zabbix-server/tasks/{postgresql,schema,admin_password}.yml
+    # are updated to the new param name.
+    version: ">=3.0.0,<5.0.0"
   - name: community.grafana
     version: ">=1.9.0"
   - name: community.crypto

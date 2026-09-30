@@ -98,13 +98,13 @@ ansible-playbook -i inventories/production playbooks/site.yml
 
 ## Deliverables — build progress
 
-- [ ] Repo scaffold + first commit
-- [ ] `common` role (hardening, users, SSH, packages, timezone, unattended-upgrades)
-- [ ] `zabbix-server` role (Zabbix + PostgreSQL + Nginx frontend, admin pw rotation)
-- [ ] `zabbix-agent` role (install, config, registration)
+- [x] Repo scaffold + first commit
+- [x] `common` role (hardening, users, SSH, packages, timezone, unattended-upgrades)
+- [x] `zabbix-server` role (Zabbix + PostgreSQL + Nginx frontend, admin pw rotation, API-driven host registration)
+- [x] `zabbix-agent` role (install, config, registration)
 - [ ] `victoriametrics` role (single-binary + systemd + retention)
 - [ ] `telegraf` role (config from template, output to VictoriaMetrics)
-- [ ] `grafana` role (install, provisioned datasources + 4 dashboards)
+- [x] `grafana` role (install, provisioned datasources + 4 dashboards)
 - [ ] 3 custom Zabbix templates (linux baseline, HTTP check, log-triggers)
 - [ ] Slack alerts wired from Zabbix + Grafana
 - [ ] Molecule tests for `common` and `zabbix-agent`

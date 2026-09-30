@@ -6,6 +6,9 @@
 !vault.yml
 inventories/**/host_vars/**/vault.yml.decrypted
 .facts_cache/
+# Vendored Galaxy collections (ansible.cfg collections_path) — install with
+# `ansible-galaxy collection install -r requirements.yml -p collections/`
+collections/
 
 # Python (virtualenvs, caches, packages)
 __pycache__/

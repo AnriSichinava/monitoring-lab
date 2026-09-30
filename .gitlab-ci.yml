@@ -1,0 +1,107 @@
+---
+# lint -> molecule -> deploy (manual gate)
+#
+# The deploy stage is intentionally manual and needs two CI/CD variables set in
+# the project settings before it will do anything:
+#   VAULT_PASSWORD  (masked)  — same value as the local .vault-pass
+#   SSH_PRIVATE_KEY (masked, file type) — a key authorized on the target VMs
+# Without them the job fails fast with a clear message rather than half-running.
+
+stages:
+  - lint
+  - test
+  - deploy
+
+default:
+  image: python:3.12-slim
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq --no-install-recommends git openssh-client
+    - pip install --quiet --upgrade pip
+    - pip install --quiet "ansible-core>=2.16" ansible-lint yamllint
+    - ansible-galaxy collection install -r requirements.yml -p collections/
+
+variables:
+  ANSIBLE_FORCE_COLOR: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+# ---------------------------------------------------------------- lint
+
+yamllint:
+  stage: lint
+  script:
+    - yamllint -c .yamllint .
+
+ansible-lint:
+  stage: lint
+  script:
+    - ansible-lint
+
+syntax-check:
+  stage: lint
+  script:
+    # Needs the vault password only to parse the encrypted group_vars file.
+    - echo "$VAULT_PASSWORD" > .vault-pass && chmod 600 .vault-pass
+    - ansible-playbook -i inventories/production playbooks/site.yml --syntax-check
+  after_script:
+    - rm -f .vault-pass
+  rules:
+    - if: $VAULT_PASSWORD
+      when: always
+    - when: never
+
+# ---------------------------------------------------------------- test
+
+.molecule:
+  stage: test
+  image: docker:27-cli
+  services:
+    - docker:27-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - apk add --no-cache python3 py3-pip git
+    - python3 -m venv /opt/venv && . /opt/venv/bin/activate
+    - pip install --quiet "ansible-core>=2.16" molecule "molecule-plugins[docker]" docker
+    # ANSIBLE_COLLECTIONS_PATH is overridden here because the scenarios default
+    # to a local Homebrew path for developer laptops (see molecule.yml comments).
+    - ansible-galaxy collection install -r requirements.yml -p /opt/collections/ansible_collections
+    - ansible-galaxy collection install community.docker -p /opt/collections/ansible_collections
+    - export ANSIBLE_HOMEBREW_COLLECTIONS=/opt/collections/ansible_collections
+  script:
+    - . /opt/venv/bin/activate
+    - export ANSIBLE_HOMEBREW_COLLECTIONS=/opt/collections/ansible_collections
+    - cd "roles/$ROLE" && molecule test
+
+molecule:common:
+  extends: .molecule
+  variables:
+    ROLE: common
+
+molecule:zabbix-agent:
+  extends: .molecule
+  variables:
+    ROLE: zabbix-agent
+
+# ---------------------------------------------------------------- deploy
+
+deploy:production:
+  stage: deploy
+  when: manual
+  environment:
+    name: production
+  script:
+    - |
+      if [ -z "$VAULT_PASSWORD" ] || [ -z "$SSH_PRIVATE_KEY" ]; then
+        echo "VAULT_PASSWORD and SSH_PRIVATE_KEY must be set as CI/CD variables." >&2
+        exit 1
+      fi
+    - echo "$VAULT_PASSWORD" > .vault-pass && chmod 600 .vault-pass
+    - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+    - cp "$SSH_PRIVATE_KEY" ~/.ssh/id_ed25519_monitoring_lab
+    - chmod 600 ~/.ssh/id_ed25519_monitoring_lab
+    - ansible-playbook -i inventories/production playbooks/site.yml
+  after_script:
+    - rm -f .vault-pass ~/.ssh/id_ed25519_monitoring_lab
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

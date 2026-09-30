@@ -15,14 +15,24 @@
 - name: Download InfluxData APT signing key (ASCII-armored)
   ansible.builtin.get_url:
     url: https://repos.influxdata.com/influxdata-archive.key
-    dest: /tmp/influxdata-archive.key
+    # Kept out of /tmp so the checksum comparison below has a stable baseline
+    # across runs — /tmp is tmpfs on these hosts and gets wiped on reboot.
+    dest: /etc/apt/keyrings/influxdata-archive.key.asc
     mode: "0644"
-    force: true # small file, re-fetched each run to catch key rotation early
+  register: influxdata_key_download
+
+- name: Check whether the dearmored keyring already exists
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/influxdata-archive.gpg
+  register: influxdata_keyring_stat
 
 - name: Dearmor InfluxData signing key into keyring format
   ansible.builtin.command: >-
     gpg --dearmor --yes --output /etc/apt/keyrings/influxdata-archive.gpg
-    /tmp/influxdata-archive.key
+    /etc/apt/keyrings/influxdata-archive.key.asc
+  # Only re-dearmor when the armored key actually changed (key rotation) or
+  # the derived keyring is missing — otherwise this reports changed on every run.
+  when: influxdata_key_download.changed or not influxdata_keyring_stat.stat.exists
   changed_when: true
 
 - name: Add InfluxData APT repo

@@ -46,6 +46,9 @@
           - monitoring-lab
         link_templates:
           - "Linux by Zabbix agent"
+          - "Linux Baseline - monitoring-lab"
+          - "HTTP Check - monitoring-lab"
+          - "Log Triggers - monitoring-lab"
         interfaces:
           - type: agent
             main: 1
@@ -62,6 +65,8 @@
           - monitoring-lab
         link_templates:
           - "Linux by Zabbix agent"
+          - "Linux Baseline - monitoring-lab"
+          - "Log Triggers - monitoring-lab"
         interfaces:
           - type: agent
             main: 1

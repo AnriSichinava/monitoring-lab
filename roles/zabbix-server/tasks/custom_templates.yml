@@ -1,0 +1,136 @@
+---
+# Three custom templates, on top of the stock "Linux by Zabbix agent":
+#   - Linux Baseline: opinionated thresholds for this lab's small VMs,
+#     as triggers referencing items already collected by the stock template
+#     (no duplicate items — Zabbix supports cross-template trigger expressions
+#     as long as both templates end up linked to the same host).
+#   - HTTP Check: a server-side simple_check against the Zabbix frontend port.
+#     No agent dependency — Zabbix server polls the port directly.
+#   - Log Triggers: active log monitoring for repeated failed SSH logins.
+#
+# Runs locally over the httpapi connection — same reasoning as host_registration.yml.
+- name: Manage custom Zabbix templates + items + triggers
+  no_log: true
+  become: false
+  vars:
+    ansible_connection: httpapi
+    ansible_network_os: community.zabbix.zabbix
+    ansible_httpapi_port: "{{ zabbix_frontend_web_port }}"
+    ansible_httpapi_use_ssl: false
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: ""
+    ansible_user: "{{ zabbix_admin_username }}"
+    ansible_httpapi_pass: "{{ zabbix_admin_password }}"
+  block:
+    - name: Ensure "Custom Templates" template group exists
+      community.zabbix.zabbix_templategroup:
+        template_groups:
+          - Custom Templates
+        state: present
+
+    - name: Create "Linux Baseline" template
+      community.zabbix.zabbix_template:
+        template_name: "Linux Baseline - monitoring-lab"
+        template_groups:
+          - Custom Templates
+        state: present
+
+    - name: Create "HTTP Check" template
+      community.zabbix.zabbix_template:
+        template_name: "HTTP Check - monitoring-lab"
+        template_groups:
+          - Custom Templates
+        state: present
+
+    - name: Create "Log Triggers" template
+      community.zabbix.zabbix_template:
+        template_name: "Log Triggers - monitoring-lab"
+        template_groups:
+          - Custom Templates
+        state: present
+
+    # --- Linux Baseline: triggers only, referencing stock template's items ---
+
+    - name: "Linux Baseline: trigger — high CPU load"
+      community.zabbix.zabbix_trigger:
+        name: "High CPU load on {HOST.NAME}"
+        template_name: "Linux Baseline - monitoring-lab"
+        params:
+          severity: average
+          expression: "min(/Linux by Zabbix agent/system.cpu.load[all,avg1],5m)>1.5"
+        state: present
+
+    - name: "Linux Baseline: trigger — low available memory"
+      community.zabbix.zabbix_trigger:
+        name: "Low available memory on {HOST.NAME}"
+        template_name: "Linux Baseline - monitoring-lab"
+        params:
+          severity: high
+          expression: "max(/Linux by Zabbix agent/vm.memory.size[pavailable],5m)<10"
+        state: present
+
+    - name: "Linux Baseline: trigger — low free swap"
+      community.zabbix.zabbix_trigger:
+        name: "Low free swap on {HOST.NAME}"
+        template_name: "Linux Baseline - monitoring-lab"
+        params:
+          severity: warning
+          expression: "last(/Linux by Zabbix agent/system.swap.size[,pfree])<50"
+        state: present
+
+    - name: "Linux Baseline: trigger — host recently rebooted"
+      community.zabbix.zabbix_trigger:
+        name: "Host {HOST.NAME} has been rebooted"
+        template_name: "Linux Baseline - monitoring-lab"
+        params:
+          severity: information
+          expression: "change(/Linux by Zabbix agent/system.uptime)<0"
+          manual_close: true
+        state: present
+
+    # --- HTTP Check: server-side simple_check item + trigger ---
+
+    - name: "HTTP Check: item — Zabbix frontend availability"
+      community.zabbix.zabbix_item:
+        name: "HTTP service check (:{{ zabbix_frontend_web_port }})"
+        template_name: "HTTP Check - monitoring-lab"
+        params:
+          key: "net.tcp.service[http,,{{ zabbix_frontend_web_port }}]"
+          type: simple_check
+          value_type: numeric_unsigned
+          interval: 1m
+        state: present
+
+    - name: "HTTP Check: trigger — frontend down"
+      community.zabbix.zabbix_trigger:
+        name: "HTTP service down on {HOST.NAME}"
+        template_name: "HTTP Check - monitoring-lab"
+        params:
+          severity: disaster
+          expression: "last(/HTTP Check - monitoring-lab/net.tcp.service[http,,{{ zabbix_frontend_web_port }}])=0"
+          manual_close: true
+        state: present
+
+    # --- Log Triggers: active log-monitoring item + trigger ---
+
+    - name: "Log Triggers: item — SSH auth log"
+      community.zabbix.zabbix_item:
+        name: "SSH auth log"
+        template_name: "Log Triggers - monitoring-lab"
+        params:
+          key: "log[/var/log/auth.log]"
+          type: zabbix_agent_active
+          value_type: log
+          interval: 1m
+        state: present
+
+    - name: "Log Triggers: trigger — repeated failed SSH logins"
+      community.zabbix.zabbix_trigger:
+        name: "Repeated failed SSH logins on {HOST.NAME}"
+        template_name: "Log Triggers - monitoring-lab"
+        params:
+          severity: high
+          expression: >-
+            count(/Log Triggers - monitoring-lab/log[/var/log/auth.log],10m,"like","Failed password")>=5
+          manual_close: true
+        state: present

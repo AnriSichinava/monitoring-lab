@@ -43,6 +43,11 @@
   ansible.builtin.include_tasks: services.yml
   tags: [zabbix_server, services]
 
+- name: Manage custom Zabbix templates + items + triggers
+  ansible.builtin.include_tasks: custom_templates.yml
+  tags: [zabbix_server, custom_templates, api]
+  run_once: true
+
 - name: Register hosts + host group in Zabbix via API
   ansible.builtin.include_tasks: host_registration.yml
   tags: [zabbix_server, host_registration, api]

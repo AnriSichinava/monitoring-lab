@@ -3,3 +3,9 @@
   ansible.builtin.apt:
     name: zabbix-agent2
     state: present
+
+- name: Add zabbix user to adm group (read access to /var/log/auth.log etc.)
+  ansible.builtin.user:
+    name: zabbix
+    groups: adm
+    append: true

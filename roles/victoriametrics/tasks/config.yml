@@ -1,0 +1,16 @@
+---
+- name: Deploy victoriametrics systemd unit
+  ansible.builtin.template:
+    src: victoriametrics.service.j2
+    dest: /etc/systemd/system/victoriametrics.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart victoriametrics
+
+- name: Ensure victoriametrics is enabled and running
+  ansible.builtin.systemd:
+    name: victoriametrics
+    daemon_reload: true
+    enabled: true
+    state: started

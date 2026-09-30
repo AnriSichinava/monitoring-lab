@@ -10,4 +10,4 @@
     - zabbix-server
     - zabbix-agent   # server monitors itself
     - grafana
-    # - victoriametrics
+    - victoriametrics

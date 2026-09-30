@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  role_name: victoriametrics
+  author: Anri Sitchinava
+  description: Single-binary VictoriaMetrics install for long-term metrics storage
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+  galaxy_tags:
+    - monitoring
+    - metrics
+    - timeseries
+
+dependencies: []

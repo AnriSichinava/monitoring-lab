@@ -1,0 +1,26 @@
+---
+# Defaults for the `victoriametrics` role.
+# VictoriaMetrics ships as a single static binary — no apt package, installed
+# straight from the GitHub release tarball.
+
+victoriametrics_version: "v1.153.0"
+
+# GitHub releases publish per-arch tarballs; map Ansible's arch fact to VM's naming.
+victoriametrics_arch_map:
+  x86_64: amd64
+  aarch64: arm64
+victoriametrics_arch: "{{ victoriametrics_arch_map[ansible_architecture] }}"
+
+victoriametrics_download_url: >-
+  https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/{{ victoriametrics_version }}/victoria-metrics-linux-{{ victoriametrics_arch }}-{{ victoriametrics_version }}.tar.gz
+
+victoriametrics_install_dir: /usr/local/bin
+victoriametrics_data_dir: /var/lib/victoria-metrics
+victoriametrics_user: victoriametrics
+victoriametrics_group: victoriametrics
+
+# HTTP API + Prometheus-remote-write + InfluxDB-line-protocol listener.
+victoriametrics_listen_port: 8428
+
+# How long to keep raw samples before rollup/eviction. VM's own format, e.g. "3d", "1y".
+victoriametrics_retention_period: "30d"

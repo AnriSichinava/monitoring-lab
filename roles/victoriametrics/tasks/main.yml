@@ -1,0 +1,8 @@
+---
+- name: Install VictoriaMetrics binary
+  ansible.builtin.include_tasks: install.yml
+  tags: [victoriametrics, packages]
+
+- name: Deploy VictoriaMetrics service
+  ansible.builtin.include_tasks: config.yml
+  tags: [victoriametrics, config, services]

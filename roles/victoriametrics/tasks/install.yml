@@ -1,0 +1,58 @@
+---
+- name: Create victoriametrics system group
+  ansible.builtin.group:
+    name: "{{ victoriametrics_group }}"
+    system: true
+    state: present
+
+- name: Create victoriametrics system user
+  ansible.builtin.user:
+    name: "{{ victoriametrics_user }}"
+    group: "{{ victoriametrics_group }}"
+    system: true
+    shell: /usr/sbin/nologin
+    home: "{{ victoriametrics_data_dir }}"
+    create_home: false
+    state: present
+
+- name: Ensure data directory exists
+  ansible.builtin.file:
+    path: "{{ victoriametrics_data_dir }}"
+    state: directory
+    owner: "{{ victoriametrics_user }}"
+    group: "{{ victoriametrics_group }}"
+    mode: "0750"
+
+- name: Check installed VictoriaMetrics version
+  ansible.builtin.command: "{{ victoriametrics_install_dir }}/victoria-metrics-prod --version"
+  register: victoriametrics_installed_version
+  failed_when: false
+  changed_when: false
+
+- name: Download + install VictoriaMetrics binary (version mismatch or not installed)
+  when: victoriametrics_version not in (victoriametrics_installed_version.stdout | default(''))
+  block:
+    - name: Download VictoriaMetrics release tarball
+      ansible.builtin.get_url:
+        url: "{{ victoriametrics_download_url }}"
+        dest: "/tmp/victoria-metrics-{{ victoriametrics_version }}.tar.gz"
+        mode: "0644"
+
+    - name: Extract VictoriaMetrics binary
+      ansible.builtin.unarchive:
+        src: "/tmp/victoria-metrics-{{ victoriametrics_version }}.tar.gz"
+        dest: "{{ victoriametrics_install_dir }}"
+        remote_src: true
+      notify: Restart victoriametrics
+
+    - name: Ensure binary is executable
+      ansible.builtin.file:
+        path: "{{ victoriametrics_install_dir }}/victoria-metrics-prod"
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Clean up downloaded tarball
+      ansible.builtin.file:
+        path: "/tmp/victoria-metrics-{{ victoriametrics_version }}.tar.gz"
+        state: absent

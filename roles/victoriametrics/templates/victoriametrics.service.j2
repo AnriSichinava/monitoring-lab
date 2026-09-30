@@ -1,0 +1,23 @@
+[Unit]
+Description=VictoriaMetrics time series database
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User={{ victoriametrics_user }}
+Group={{ victoriametrics_group }}
+ExecStart={{ victoriametrics_install_dir }}/victoria-metrics-prod \
+  -storageDataPath={{ victoriametrics_data_dir }} \
+  -retentionPeriod={{ victoriametrics_retention_period }} \
+  -httpListenAddr=:{{ victoriametrics_listen_port }}
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths={{ victoriametrics_data_dir }}
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

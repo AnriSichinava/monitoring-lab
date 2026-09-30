@@ -102,8 +102,8 @@ ansible-playbook -i inventories/production playbooks/site.yml
 - [x] `common` role (hardening, users, SSH, packages, timezone, unattended-upgrades)
 - [x] `zabbix-server` role (Zabbix + PostgreSQL + Nginx frontend, admin pw rotation, API-driven host registration)
 - [x] `zabbix-agent` role (install, config, registration)
-- [ ] `victoriametrics` role (single-binary + systemd + retention)
-- [ ] `telegraf` role (config from template, output to VictoriaMetrics)
+- [x] `victoriametrics` role (single-binary + systemd + retention)
+- [x] `telegraf` role (config from template, output to VictoriaMetrics)
 - [x] `grafana` role (install, provisioned datasources + 4 dashboards)
 - [ ] 3 custom Zabbix templates (linux baseline, HTTP check, log-triggers)
 - [ ] Slack alerts wired from Zabbix + Grafana

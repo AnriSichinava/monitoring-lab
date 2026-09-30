@@ -1,0 +1,200 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": { "type": "alexanderzobnin-zabbix-triggers-panel", "uid": "zabbix" },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "ackEventColor": "rgba(56, 219, 156, 0.6)",
+        "ackField": true,
+        "ageField": true,
+        "customLastChangeFormat": false,
+        "descriptionAtNewLine": false,
+        "descriptionField": true,
+        "fontSize": "100%",
+        "highlightBackground": false,
+        "hostField": true,
+        "hostFilter": "/.*/",
+        "hostGroups": ["monitoring-lab"],
+        "hostProxy": false,
+        "hostTechNameField": false,
+        "layout": "list",
+        "lineHeight": "1.2",
+        "markAckEvents": false,
+        "opdataField": true,
+        "pageSize": 10,
+        "problemTags": [],
+        "resizedColumns": [],
+        "severityField": true,
+        "showTags": true,
+        "sortProblems": "lastchange",
+        "statusField": true,
+        "statusIcon": false,
+        "targets": [],
+        "tagsField": true,
+        "triggerSeverity": [
+          { "color": "rgb(108, 108, 108)", "priority": 0, "severity": "Not classified", "show": true },
+          { "color": "rgb(120, 158, 183)", "priority": 1, "severity": "Information", "show": true },
+          { "color": "rgb(175, 180, 36)", "priority": 2, "severity": "Warning", "show": true },
+          { "color": "rgb(255, 137, 30)", "priority": 3, "severity": "Average", "show": true },
+          { "color": "rgb(255, 101, 72)", "priority": 4, "severity": "High", "show": true },
+          { "color": "rgb(215, 0, 0)", "priority": 5, "severity": "Disaster", "show": true }
+        ],
+        "trigger": { "filter": "" },
+        "valueField": true
+      },
+      "title": "Active Problems — monitoring-lab",
+      "type": "alexanderzobnin-zabbix-triggers-panel"
+    },
+    {
+      "datasource": { "type": "alexanderzobnin-zabbix-datasource", "uid": "zabbix" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
+      "id": 2,
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "right", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "alexanderzobnin-zabbix-datasource", "uid": "zabbix" },
+          "functions": [],
+          "group": { "filter": "/.*/" },
+          "host": { "filter": "/.*/" },
+          "item": { "filter": "Load average (1m avg)" },
+          "itemTag": { "filter": "" },
+          "options": { "showDisabledItems": false, "skipEmptyValues": false, "useZabbixValueMapping": false },
+          "queryType": "0",
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Load average (1m) — all hosts",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "alexanderzobnin-zabbix-datasource", "uid": "zabbix" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
+      "id": 3,
+      "options": {
+        "legend": { "calcs": ["mean", "min"], "displayMode": "table", "placement": "right", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "alexanderzobnin-zabbix-datasource", "uid": "zabbix" },
+          "functions": [],
+          "group": { "filter": "/.*/" },
+          "host": { "filter": "/.*/" },
+          "item": { "filter": "Free swap space in %" },
+          "itemTag": { "filter": "" },
+          "options": { "showDisabledItems": false, "skipEmptyValues": false, "useZabbixValueMapping": false },
+          "queryType": "0",
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Free swap — all hosts",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "alexanderzobnin-zabbix-datasource", "uid": "zabbix" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "dtdurations"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 18 },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "alexanderzobnin-zabbix-datasource", "uid": "zabbix" },
+          "functions": [],
+          "group": { "filter": "/.*/" },
+          "host": { "filter": "/.*/" },
+          "item": { "filter": "System uptime" },
+          "itemTag": { "filter": "" },
+          "options": { "showDisabledItems": false, "skipEmptyValues": false, "useZabbixValueMapping": false },
+          "queryType": "0",
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "System uptime — per host",
+      "type": "stat"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["monitoring-lab", "alerts"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "System Health & Alerts",
+  "uid": "system-health-alerts",
+  "version": 1,
+  "weekStart": ""
+}

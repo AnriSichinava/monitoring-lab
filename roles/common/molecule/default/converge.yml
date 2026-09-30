@@ -1,0 +1,11 @@
+---
+# NTP (systemd-timesyncd) is skipped here — a Docker container has no real host
+# clock to discipline and the image doesn't ship the service. This is a test-
+# environment limitation, not a role bug; the role remains untouched for real VMs.
+- name: Converge
+  hosts: all
+  become: true
+  tasks:
+    - name: Apply the common role
+      ansible.builtin.include_role:
+        name: common

@@ -1,0 +1,59 @@
+---
+role_name_check: 2 # roles here aren't published to Galaxy; skip the FQRN naming check
+
+dependency:
+  name: galaxy
+
+driver:
+  name: docker
+
+platforms:
+  - name: common-test
+    image: "geerlingguy/docker-${MOLECULE_DISTRO:-ubuntu2404}-ansible:latest"
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    cgroupns_mode: host
+    privileged: true
+    pre_build_image: true
+
+provisioner:
+  name: ansible
+  options:
+    # ntp: no real host clock to discipline in a container.
+    # ssh: the generic test image has no openssh-server at all (real cloud images
+    #      always ship it — this is a test-image gap, not a role assumption bug).
+    skip-tags: ntp,ssh
+  env:
+    ANSIBLE_REMOTE_TMP: /tmp/.ansible-remote
+    # community.general/postgresql/zabbix/grafana etc. come bundled with the full
+    # "ansible" package (Homebrew's `ansible` formula), not bare ansible-core (what
+    # pip installs as a molecule dependency) — point at Homebrew's vendored
+    # collections dir, plus the default user path where community.docker (needed
+    # by molecule's own docker driver playbooks) actually lives.
+    ANSIBLE_COLLECTIONS_PATH: "${ANSIBLE_HOMEBREW_COLLECTIONS:-/opt/homebrew/Cellar/ansible/14.4.0/libexec/lib/python3.14/site-packages/ansible_collections}:/Users/anrisichinava/.ansible/collections"
+  playbooks:
+    converge: converge.yml
+    verify: verify.yml
+  inventory:
+    host_vars:
+      common-test:
+        # Molecule containers have no real NTP/timesyncd control over the host clock
+        # and no systemd-managed sshd restart target worth testing here.
+        common_unattended_upgrades_enabled: true
+
+scenario:
+  name: default
+  test_sequence:
+    - dependency
+    - destroy
+    - syntax
+    - create
+    - converge
+    - idempotence
+    - verify
+    - destroy

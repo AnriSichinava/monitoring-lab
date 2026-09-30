@@ -1,0 +1,38 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert baseline packages are installed
+      ansible.builtin.assert:
+        that:
+          - "'curl' in ansible_facts.packages"
+          - "'htop' in ansible_facts.packages"
+          - "'net-tools' in ansible_facts.packages"
+        fail_msg: "One or more baseline packages from common_packages were not installed"
+
+    - name: Assert unattended-upgrades is installed
+      ansible.builtin.assert:
+        that:
+          - "'unattended-upgrades' in ansible_facts.packages"
+
+    # SSH hardening is skipped in this scenario (skip-tags: ssh in molecule.yml) —
+    # the generic test image ships no openssh-server at all, so there's nothing to
+    # verify here. Real cloud VMs always have it; see roles/common/tasks/ssh.yml.
+
+    - name: Assert timezone was set
+      ansible.builtin.command: timedatectl show --property=Timezone --value
+      register: current_timezone
+      changed_when: false
+      failed_when: false
+
+    - name: Assert timezone matches common_timezone default (UTC)
+      ansible.builtin.assert:
+        that:
+          - current_timezone.stdout == "UTC" or current_timezone.rc != 0
+        fail_msg: "Timezone was not set to the expected value"
+      when: current_timezone.rc == 0

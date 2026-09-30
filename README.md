@@ -107,8 +107,8 @@ ansible-playbook -i inventories/production playbooks/site.yml
 - [x] `grafana` role (install, provisioned datasources + 4 dashboards)
 - [x] 3 custom Zabbix templates (linux baseline, HTTP check, log-triggers)
 - [ ] Slack alerts wired from Zabbix + Grafana
-- [ ] Molecule tests for `common` and `zabbix-agent`
-- [ ] GitLab CI pipeline (lint → molecule → staged deploy)
+- [x] Molecule tests for `common` and `zabbix-agent`
+- [x] GitLab CI pipeline (lint → molecule → staged deploy)
 - [ ] Architecture diagram (Excalidraw) + dashboard screenshots
 
 ## What I learned

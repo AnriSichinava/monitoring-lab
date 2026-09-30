@@ -2,7 +2,7 @@
 # Variables applied to every host.
 # Component-specific vars live in role defaults; only cross-cutting settings go here.
 
-timezone: Asia/Jerusalem
+timezone: Asia/Tbilisi
 locale: en_US.UTF-8
 
 # Base admin user created by the `common` role.

@@ -7,7 +7,7 @@ Base OS configuration applied to every host in the inventory before any componen
 | Concern | Details |
 |---|---|
 | **Baseline packages** | Installs a curated list of CLI tools (curl, vim, htop, jq, python3, ca-certificates, etc.) |
-| **Timezone** | Sets system timezone via `systemd-timedated` (default `UTC`, overridden to `Asia/Jerusalem` in group_vars) |
+| **Timezone** | Sets system timezone via `systemd-timedated` (default `UTC`, overridden to `Asia/Tbilisi` in group_vars) |
 | **Locale** | Generates + activates the system locale (default `en_US.UTF-8`) |
 | **NTP** | Configures `systemd-timesyncd` with pool.ntp.org and ensures it's running |
 | **SSH hardening** | Drop-in config at `/etc/ssh/sshd_config.d/99-monitoring-lab-hardening.conf` — password auth off, root login off, key-only |

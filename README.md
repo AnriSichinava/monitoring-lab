@@ -105,7 +105,7 @@ ansible-playbook -i inventories/production playbooks/site.yml
 - [x] `victoriametrics` role (single-binary + systemd + retention)
 - [x] `telegraf` role (config from template, output to VictoriaMetrics)
 - [x] `grafana` role (install, provisioned datasources + 4 dashboards)
-- [ ] 3 custom Zabbix templates (linux baseline, HTTP check, log-triggers)
+- [x] 3 custom Zabbix templates (linux baseline, HTTP check, log-triggers)
 - [ ] Slack alerts wired from Zabbix + Grafana
 - [ ] Molecule tests for `common` and `zabbix-agent`
 - [ ] GitLab CI pipeline (lint → molecule → staged deploy)

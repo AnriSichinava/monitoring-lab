@@ -1,12 +1,22 @@
 ---
-# Three custom templates, on top of the stock "Linux by Zabbix agent":
-#   - Linux Baseline: opinionated thresholds for this lab's small VMs,
-#     as triggers referencing items already collected by the stock template
-#     (no duplicate items — Zabbix supports cross-template trigger expressions
-#     as long as both templates end up linked to the same host).
+# Two custom templates, plus 4 baseline triggers layered onto the stock
+# "Linux by Zabbix agent" template:
+#   - Linux Baseline triggers: opinionated thresholds for this lab's small VMs
+#     (high CPU load, low memory, low swap, reboot detection). These are NOT
+#     a separate template — Zabbix determines a trigger's owning template
+#     from the items its *expression* references, not from whatever
+#     template_name is passed to the API call that creates it. Since these
+#     triggers only reference "Linux by Zabbix agent" items, Zabbix always
+#     attaches them there regardless of intent, and a separate empty
+#     "Linux Baseline" template pointing at them would permanently show 0
+#     triggers while creation silently kept re-attempting (and failing,
+#     "already exists on Linux by Zabbix agent") on every subsequent run.
+#     Learned this the hard way — see git history for the original attempt.
 #   - HTTP Check: a server-side simple_check against the Zabbix frontend port.
-#     No agent dependency — Zabbix server polls the port directly.
+#     No agent dependency — Zabbix server polls the port directly. Owns its
+#     own item, so no cross-template ownership surprise here.
 #   - Log Triggers: active log monitoring for repeated failed SSH logins.
+#     Also owns its own item.
 #
 # Runs locally over the httpapi connection — same reasoning as host_registration.yml.
 - name: Manage custom Zabbix templates + items + triggers
@@ -28,12 +38,10 @@
           - Custom Templates
         state: present
 
-    - name: Create "Linux Baseline" template
+    - name: Remove orphaned "Linux Baseline - monitoring-lab" template (superseded — see header comment)
       community.zabbix.zabbix_template:
         template_name: "Linux Baseline - monitoring-lab"
-        template_groups:
-          - Custom Templates
-        state: present
+        state: absent
 
     - name: Create "HTTP Check" template
       community.zabbix.zabbix_template:
@@ -49,12 +57,13 @@
           - Custom Templates
         state: present
 
-    # --- Linux Baseline: triggers only, referencing stock template's items ---
+    # --- Linux Baseline triggers: layered directly onto the stock template,
+    # since that's where Zabbix places them regardless (see header comment) ---
 
     - name: "Linux Baseline: trigger — high CPU load"
       community.zabbix.zabbix_trigger:
         name: "High CPU load on {HOST.NAME}"
-        template_name: "Linux Baseline - monitoring-lab"
+        template_name: "Linux by Zabbix agent"
         params:
           severity: average
           expression: "min(/Linux by Zabbix agent/system.cpu.load[all,avg1],5m)>1.5"
@@ -63,7 +72,7 @@
     - name: "Linux Baseline: trigger — low available memory"
       community.zabbix.zabbix_trigger:
         name: "Low available memory on {HOST.NAME}"
-        template_name: "Linux Baseline - monitoring-lab"
+        template_name: "Linux by Zabbix agent"
         params:
           severity: high
           expression: "max(/Linux by Zabbix agent/vm.memory.size[pavailable],5m)<10"
@@ -72,7 +81,7 @@
     - name: "Linux Baseline: trigger — low free swap"
       community.zabbix.zabbix_trigger:
         name: "Low free swap on {HOST.NAME}"
-        template_name: "Linux Baseline - monitoring-lab"
+        template_name: "Linux by Zabbix agent"
         params:
           severity: warning
           expression: "last(/Linux by Zabbix agent/system.swap.size[,pfree])<50"
@@ -81,7 +90,7 @@
     - name: "Linux Baseline: trigger — host recently rebooted"
       community.zabbix.zabbix_trigger:
         name: "Host {HOST.NAME} has been rebooted"
-        template_name: "Linux Baseline - monitoring-lab"
+        template_name: "Linux by Zabbix agent"
         params:
           severity: information
           expression: "change(/Linux by Zabbix agent/system.uptime)<0"

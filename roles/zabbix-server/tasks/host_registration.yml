@@ -45,8 +45,7 @@
         host_groups:
           - monitoring-lab
         link_templates:
-          - "Linux by Zabbix agent"
-          - "Linux Baseline - monitoring-lab"
+          - "Linux by Zabbix agent" # also carries the Linux Baseline triggers — see custom_templates.yml
           - "HTTP Check - monitoring-lab"
           - "Log Triggers - monitoring-lab"
         interfaces:
@@ -64,8 +63,7 @@
         host_groups:
           - monitoring-lab
         link_templates:
-          - "Linux by Zabbix agent"
-          - "Linux Baseline - monitoring-lab"
+          - "Linux by Zabbix agent" # also carries the Linux Baseline triggers — see custom_templates.yml
           - "Log Triggers - monitoring-lab"
         interfaces:
           - type: agent

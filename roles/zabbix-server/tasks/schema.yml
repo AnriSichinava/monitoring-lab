@@ -13,8 +13,9 @@
 - name: Import Zabbix schema
   ansible.builtin.shell:
     cmd: >-
-      zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz
+      set -o pipefail && zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz
       | psql -h {{ zabbix_db_host }} -p {{ zabbix_db_port }} -U {{ zabbix_db_user }} -d {{ zabbix_db_name }}
+    executable: /bin/bash
   environment:
     PGPASSWORD: "{{ zabbix_db_password }}"
   when: not zabbix_schema_check.query_result[0].exists

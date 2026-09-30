@@ -1,0 +1,18 @@
+---
+extends: default
+
+rules:
+  line-length:
+    # Some lines are long Jinja-templated URLs or apt-repo strings that can't be
+    # wrapped without breaking the template (folded YAML `>-` inserts spaces).
+    max: 220
+  truthy:
+    allowed-values: ["true", "false"]
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: disable
+  braces:
+    max-spaces-inside: 1
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true

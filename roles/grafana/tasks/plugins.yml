@@ -27,6 +27,7 @@
     chdir: /usr/share/grafana
   loop: "{{ grafana_plugins }}"
   when: item not in grafana_installed_plugins.stdout
+  changed_when: true # only runs when the plugin isn't already listed, so a run here is always a real change
   notify: Restart grafana-server
 
 - name: Ensure plugin files are owned by grafana user

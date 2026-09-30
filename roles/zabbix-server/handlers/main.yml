@@ -10,6 +10,12 @@
     state: reloaded
 
 - name: Restart php-fpm
-  ansible.builtin.shell: |
-    systemctl restart $(systemctl list-unit-files 'php*-fpm.service' --no-legend | awk '{print $1}' | head -1)
-  changed_when: true
+  block:
+    - name: Gather service facts to detect the installed PHP-FPM service name
+      ansible.builtin.service_facts:
+
+    - name: Restart the detected PHP-FPM service
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: restarted
+      loop: "{{ ansible_facts.services | dict2items | selectattr('key', 'match', '^php.*-fpm\\.service$') | map(attribute='key') | list }}"

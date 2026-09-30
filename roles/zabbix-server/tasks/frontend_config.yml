@@ -1,7 +1,8 @@
 ---
 - name: Detect PHP-FPM socket path
-  ansible.builtin.shell: |
-    ls /run/php/php*-fpm.sock 2>/dev/null | head -1
+  ansible.builtin.shell:
+    cmd: set -o pipefail && ls /run/php/php*-fpm.sock 2>/dev/null | head -1
+    executable: /bin/bash
   register: php_fpm_sock
   changed_when: false
   failed_when: php_fpm_sock.stdout == ""

@@ -2,5 +2,8 @@
 # Master playbook — runs everything, in order.
 # Usage: ansible-playbook -i inventories/production playbooks/site.yml
 
-- import_playbook: monitoring-server.yml
-- import_playbook: targets.yml
+- name: Import monitoring-server playbook
+  import_playbook: monitoring-server.yml
+
+- name: Import targets playbook
+  import_playbook: targets.yml

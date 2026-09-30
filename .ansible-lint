@@ -1,0 +1,25 @@
+---
+profile: basic
+
+skip_list:
+  # Role directories use hyphens (zabbix-agent, zabbix-server) to match the
+  # actual Zabbix component names — clearer than forcing zabbix_agent/
+  # zabbix_server, and these roles are never published to Galaxy so the FQRN
+  # naming convention doesn't apply. Renaming would also ripple through every
+  # playbook/meta dependency reference for no real benefit.
+  - role-name
+  - schema[meta]
+  # ntp_servers/timezone/locale/admin_user are intentionally shared,
+  # non-role-prefixed vars in group_vars/all/main.yml — they're cross-cutting
+  # settings by design (see that file's own header comment), not role-local.
+  - var-naming[no-role-prefix]
+  # "Refresh apt cache after adding X repo" is deliberately inline (when:
+  # ..._install.changed), not a handler — it must run before the very next task
+  # in the same file (installing the just-added repo's packages), and handlers
+  # only fire at the end of a play. A handler here would be a real bug, not a fix.
+  - no-handler
+
+exclude_paths:
+  - .gitlab-ci.yml
+  - "**/molecule/**"
+  - inventories/production/group_vars/all/vault.yml # Ansible Vault ciphertext, not parseable YAML
